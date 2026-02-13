@@ -1,0 +1,7 @@
+*
+!.gitignore
+!artscripts/horoscope.arsc
+!artscripts/horoscope_files/**
+!charsets/**
+!palettes/**
+!playscii.py
