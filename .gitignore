@@ -1,5 +1,6 @@
 *
 !.gitignore
+!artscripts/
 !artscripts/horoscope.arsc
 !artscripts/astrology.arsc
 !artscripts/horoscope_files/**

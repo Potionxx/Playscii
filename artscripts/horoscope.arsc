@@ -1,0 +1,48 @@
+# Artscript file to be run by Playscii
+print("\n\n\nRunning horoscope.arsc")
+# Library imports
+
+# Local imports
+# Include a file in /horoscope_files with your natal information and import it like this.
+from artscripts.horoscope_files.potion_natal_data import POTION_NATAL_PLANETS, POTION_NATAL_HOUSES
+
+# Then save the imported natal data into variables named NATAL_PLANETS and NATAL_HOUSES
+NATAL_PLANETS = POTION_NATAL_PLANETS
+NATAL_HOUSES = POTION_NATAL_HOUSES
+
+
+print(f"Testing Imports:")
+try:    
+    print(f"Natal Planets:\n{NATAL_PLANETS}\n")
+except ImportError:
+    print(f"Could not import NATAL_PLANETS: {NATAL_PLANETS}. Possible filepath issue, or naming mismatch.")
+    print(" You will need to restart Playscii after fixing the issue.")
+
+try:
+    print(f"Natal Houses:\n{NATAL_HOUSES}\n")
+except ImportError:
+    print(f"Could not import NATAL_HOUSES: {NATAL_HOUSES}. Possible filepath issue, or naming mismatch.")
+    print(" You will need to restart Playscii after fixing the issue.")
+
+# Global variables
+#    colors
+#    symbols
+
+
+# Natal Planets
+
+# Natal Houses
+
+# AstrologyCalculatorClass
+#    class constants
+#    PLANET_NUMBERS
+#    ZODIAC_ABRIVIATIONS
+#    ZODIAC_DEGREES
+#    ASPECT_DEGREES
+#    DOMICILE_DICT
+#    DETRIMENT_DICT
+#    EXALTATION_DICT
+#    FALL_DICT
+
+
+# DrawClass
