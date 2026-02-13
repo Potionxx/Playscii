@@ -9,6 +9,13 @@ from artscripts.horoscope_files.potion_natal_data import POTION_NATAL_PLANETS, P
 # Then save the imported natal data into variables named NATAL_PLANETS and NATAL_HOUSES
 NATAL_PLANETS = POTION_NATAL_PLANETS
 NATAL_HOUSES = POTION_NATAL_HOUSES
+YEARMONTH = "2026-02"
+"""
+EPHEMERIS CSV FILE:
+    Must be in the /artscripts/horoscope_files directory
+    Must be named "ephemeris_yyyy-mm.csv"
+    Created from data downloaded from https://astrowin.org/ephemeris/index.php
+"""
 
 class AstrologyCalculator:
     """This class will contain all the methods for calculating astrological information based on the natal chart."""
@@ -119,6 +126,50 @@ class AstrologyCalculator:
         "capricorn": "jupiter",
         "aries": "saturn",
     }
+    CHAR_NAMES = {
+        "AR":114,
+        "TA":115,
+        "GE":116,
+        "CN":117,
+        "LE":118,
+        "VI":119,
+        "LI":134,
+        "SC":135,
+        "SG":136,
+        "CP":137,
+        "AQ":138,
+        "PI":139,	
+        "sun":154,
+        "moon":155,
+        "mercury":156,
+        "venus":157,
+        "mars":158,
+        "jupiter":159,
+        "saturn":174,
+        "uranus":175,
+        "neptune":176,
+        "pluto":177,
+        "north_node":178,
+        "chiron":179,
+    }
+    WEEKDAY_RULING_PLANETS = {
+        "Mo": CHAR_NAMES["moon"],
+        "Tu": CHAR_NAMES["mars"],
+        "We": CHAR_NAMES["mercury"],
+        "Th": CHAR_NAMES["jupiter"],
+        "Fr": CHAR_NAMES["venus"],
+        "Sa": CHAR_NAMES["saturn"],
+        "Su": CHAR_NAMES["sun"]
+    }
+    WEEKDAY_NAMES = {
+        "Mo": "Monday",
+        "Tu": "Tuesday",
+        "We": "Wednesday",
+        "Th": "Thursday",
+        "Fr": "Friday",
+        "Sa": "Saturday",
+        "Su": "Sunday"
+    }
     def __init__(self, natal_planets, natal_houses):
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
@@ -138,6 +189,7 @@ class AstrologyCalculator:
         except ImportError:
             print(f"Could not import NATAL_HOUSES: {self.natal_houses}. Possible filepath issue, or naming mismatch.")
             print(" You will need to restart Playscii after fixing the issue.")
+
 
 # Global variables
 #    colors
