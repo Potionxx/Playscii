@@ -224,22 +224,25 @@ class AstrologyCalculator:
             print(row)
 
 
-    def get_sign(self, ephemery_string):
-        """Returns the full name of a zodiac sign."""
+    def get_sign_abreve(self, ephemery_string): 
+        """Returns a 2 char zodiac string from one of the csv file's ephemery strings."""
         abrev = ephemery_string[2:4]
-        return(self.zodiac_abr[abrev])
+        return(abrev)
     
 
-    def get_sign_abreve(self, ephem): 
-        """Returns a 2char zodiac string."""
-        abrev = ephem[2:4]
-        return(abrev)
- 
+    def get_sign(self, ephemery_string):
+        """Returns the full name of a zodiac sign."""
+        abrev = self.get_sign_abreve(ephemery_string)
+        full_sign_name = self.ZODIAC_ABRIVIATIONS[abrev]
+        return(full_sign_name)  
+    
 
     def get_degree(self, ephemery_string):
-        """Returns a < 30 degree."""
+        """Returns a degree between 0 and 29 from an ephemeris string."""
         deg = ephemery_string[:2]
         return(deg)
+    
+    
 
 # Global variables
 #    colors
