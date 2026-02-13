@@ -9,7 +9,7 @@ from artscripts.horoscope_files.potion_natal_data import POTION_NATAL_PLANETS, P
 # Then save the imported natal data into variables named NATAL_PLANETS and NATAL_HOUSES
 NATAL_PLANETS = POTION_NATAL_PLANETS
 NATAL_HOUSES = POTION_NATAL_HOUSES
-YEARMONTH = "2026-02"
+YEAR_MONTH = "2026-02"
 """
 EPHEMERIS CSV FILE:
     Must be in the /artscripts/horoscope_files directory
@@ -170,9 +170,13 @@ class AstrologyCalculator:
         "Sa": "Saturday",
         "Su": "Sunday"
     }
-    def __init__(self, natal_planets, natal_houses):
+    def __init__(self, natal_planets, natal_houses, year_month):
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
+        self.year_month = year_month
+        self.month_num = year_month[5:7]
+        self.year = year_month[0:4]    
+        self.ephemeris_data = []
         self.test_natal_data()
 
     def test_natal_data(self):
@@ -190,6 +194,34 @@ class AstrologyCalculator:
             print(f"Could not import NATAL_HOUSES: {self.natal_houses}. Possible filepath issue, or naming mismatch.")
             print(" You will need to restart Playscii after fixing the issue.")
 
+    def import_ephemeris(self):
+        "This method will import the ephemeris data for the current month and year. It will save the data in a variable called ephemeris_data."
+        import os
+        import csv
+        csvfilename = f'ephemeris_{self.year_month}.csv'
+        cwd = os.getcwd()
+        csv_filepath = cwd + "/artscripts/horoscope_files/" + csvfilename
+        
+        
+        with open(csv_filepath) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            ephemeris_data = []
+            for row in csv_reader:
+                if line_count == 0:
+                    # print(f'Column names are {", ".join(row)}')
+                    line_count += 1
+                else:
+                    self.ephemeris_data.append(row)
+                    line_count += 1
+            print(f'Imported ephemeris data from {csvfilename}, total lines: {line_count}')
+
+
+    def log_ephemeris(self):
+        "This method will print the imported ephemeris data to the console for testing purposes."
+        print("Ephemeris Data:")
+        for row in self.ephemeris_data:
+            print(row)
 
 # Global variables
 #    colors
@@ -215,4 +247,6 @@ class AstrologyCalculator:
 # DrawClass
 
 
-ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES)
+ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
+ac.import_ephemeris()
+ac.log_ephemeris()
