@@ -10,19 +10,27 @@ from artscripts.horoscope_files.potion_natal_data import POTION_NATAL_PLANETS, P
 NATAL_PLANETS = POTION_NATAL_PLANETS
 NATAL_HOUSES = POTION_NATAL_HOUSES
 
+class AstrologyCalculator:
+    """This class will contain all the methods for calculating astrological information based on the natal chart."""
+    def __init__(self, natal_planets, natal_houses):
+        self.natal_planets = natal_planets
+        self.natal_houses = natal_houses
+        self.test_natal_data()
 
-print(f"Testing Imports:")
-try:    
-    print(f"Natal Planets:\n{NATAL_PLANETS}\n")
-except ImportError:
-    print(f"Could not import NATAL_PLANETS: {NATAL_PLANETS}. Possible filepath issue, or naming mismatch.")
-    print(" You will need to restart Playscii after fixing the issue.")
+    def test_natal_data(self):
+        "This method is for testing the imported natal data. It will print the natal planets and houses to the console."
+        print(f"Testing Natal Imports:")
+        try:    
+            print(f"Natal Planets:\n{self.natal_planets}\n")
+        except ImportError:
+            print(f"Could not import NATAL_PLANETS: {self.natal_planets}. Possible filepath issue, or naming mismatch.")
+            print(" You will need to restart Playscii after fixing the issue.")
 
-try:
-    print(f"Natal Houses:\n{NATAL_HOUSES}\n")
-except ImportError:
-    print(f"Could not import NATAL_HOUSES: {NATAL_HOUSES}. Possible filepath issue, or naming mismatch.")
-    print(" You will need to restart Playscii after fixing the issue.")
+        try:
+            print(f"Natal Houses:\n{self.natal_houses}\n")
+        except ImportError:
+            print(f"Could not import NATAL_HOUSES: {self.natal_houses}. Possible filepath issue, or naming mismatch.")
+            print(" You will need to restart Playscii after fixing the issue.")
 
 # Global variables
 #    colors
@@ -46,3 +54,6 @@ except ImportError:
 
 
 # DrawClass
+
+
+ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES)
