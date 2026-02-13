@@ -12,6 +12,113 @@ NATAL_HOUSES = POTION_NATAL_HOUSES
 
 class AstrologyCalculator:
     """This class will contain all the methods for calculating astrological information based on the natal chart."""
+    PLANET_DICT = {
+        1: "sun",
+        2: "moon",
+        3: "mercury",
+        4: "venus", 
+        5: "mars",
+        6: "jupiter",
+        7: "saturn", 
+        8: "uranus", 
+        9: "neptune", 
+        10: "pluto", 
+        11: "chiron", 
+        12: "north_node"
+    }
+    ZODIAC_ABRIVIATIONS = {
+        "AR": "aries",
+        "TA": "taurus", 
+        "GE": "gemini", 
+        "CN": "cancer", 
+        "LE": "leo", 
+        "VI": "virgo", 
+        "LI": "libra", 
+        "SC": "scorpio", 
+        "SG": "sagittarius", 
+        "CP": "capricorn", 
+        "AQ": "aquarius", 
+        "PI": "pisces"
+    }
+    ZODIAC_DEGREES = {
+        "AR": 0, 
+        "TA": 30, 
+        "GE": 60, 
+        "CN": 90, 
+        "LE": 120, 
+        "VI": 150, 
+        "LI": 180, 
+        "SC": 210, 
+        "SG": 240, 
+        "CP": 270, 
+        "AQ": 300, 
+        "PI": 330
+    }
+    ASPECT_DEGREES = {
+        0: "conjunct", 
+        60: "sextile", 
+        90: "square", 
+        120: "trine", 
+        150: "inconjunct", 
+        180: "opposing"
+    }
+    MOON_PHASE_NAMES= {
+        0: ["new", "moon"],
+        1: ["waxing", "cresnt"],
+        2: ["first", "quartr"],
+        3: ["waxing", "gibbus"],
+        4: ["full", "moon"],
+        5: ["waning", "gibbus"],
+        6: ["3rd", "quartr"],
+        7: ["waning", "cresnt"]
+    }
+
+    DOMICILE_DICT = {
+        "leo": "sun",
+        "cancer": "moon",
+        "gemini": "mercury",
+        "virgo": "mercury",
+        "libra": "venus",
+        "taurus": "venus",
+        "aries": "mars",
+        "scorpio": "mars",
+        "sagittarius": "jupiter",
+        "pisces": "jupiter",
+        "capricorn": "saturn",
+        "aquarius": "saturn"
+    }
+    DETRIMENT_DICT = {
+        "aquarius": "sun",
+        "capricorn": "moon",
+        "sagittarius": "mercury",
+        "pisces": "mercury",
+        "aries": "venus",
+        "scorpio": "venus",
+        "libra": "mars",
+        "taurus": "mars",
+        "gemini": "jupiter",
+        "virgo": "jupiter",
+        "cancer": "saturn",
+        "leo": "saturn"  
+    }
+    EXALTATION_DICT = {
+        "aries": "sun",
+        "taurus": "moon",
+        "virgo": "mercury",
+        "pisces": "venus",
+        "capricorn": "mars",
+        "cancer": "jupiter",
+        "libra": "saturn",
+    }
+    FALL_DICT = {
+        "libra": "sun",
+        "scorpio": "moon",
+        "pisces": "mercury",
+        "virgo": "venus",
+        "cancer": "mars",
+        "capricorn": "jupiter",
+        "aries": "saturn",
+    }
     def __init__(self, natal_planets, natal_houses):
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
