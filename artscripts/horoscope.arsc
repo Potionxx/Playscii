@@ -195,7 +195,13 @@ class AstrologyCalculator:
             print(" You will need to restart Playscii after fixing the issue.")
 
     def import_ephemeris(self):
-        "This method will import the ephemeris data for the current month and year. It will save the data in a variable called ephemeris_data."
+        """This method imports the ephemeris data for the current month and year. 
+        
+        The ephemeris data can be copied from https://astrowin.org/ephemeris/index.php.
+        Then the copied data can be pasted into a spreadsheet, and exported as a csv.
+        The file must be named "ephemeris_yyyy-mm.csv" and placed in the /artscripts/horoscope_files directory.
+        It will save the data in a variable called self.ephemeris_data.
+        """
         import os
         import csv
         csvfilename = f'ephemeris_{self.year_month}.csv'
@@ -225,20 +231,34 @@ class AstrologyCalculator:
 
 
     def get_sign_abreve(self, ephemery_string): 
-        """Returns a 2 char zodiac string from one of the csv file's ephemery strings."""
+        """Returns a 2 char zodiac string from one of the csv file's ephemery strings.
+        
+        If the ephemery string is "15AR23", this method will return "AR". 
+        The first two characters are the degree, the next two characters are the zodiac sign abreviation, 
+        and the last two characters are not used by this program.
+        """
         abrev = ephemery_string[2:4]
         return(abrev)
     
 
     def get_sign(self, ephemery_string):
-        """Returns the full name of a zodiac sign."""
+        """Returns the full name of a zodiac sign.
+        
+        If the ephemery string is "15AR23", this method will return "Aries".
+        """
         abrev = self.get_sign_abreve(ephemery_string)
         full_sign_name = self.ZODIAC_ABRIVIATIONS[abrev]
         return(full_sign_name)  
     
 
     def get_degree(self, ephemery_string):
-        """Returns a degree between 0 and 29 from an ephemeris string."""
+        """Returns a degree between 0 and 29 from an ephemeris string.
+        
+        If the ephemery string is "15AR23", this method will return "15".
+        The first two characters of the ephemery string are the degree,
+        the next two characters are the zodiac sign abreviation,
+        and the last two characters are not used by this program.
+        """
         deg = ephemery_string[:2]
         return(deg)
     
