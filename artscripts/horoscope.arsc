@@ -262,6 +262,15 @@ class AstrologyCalculator:
         deg = ephemery_string[:2]
         return(deg)
     
+
+    def test_getters(self, ephemery_string):
+        """This method is for testing the get_sign_abreve, get_sign, and get_degree methods.
+        """
+        print(f"Testing getters with ephemery string: {ephemery_string}")
+        print(f"Sign abreviation: {self.get_sign_abreve(ephemery_string)}")
+        print(f"Sign full name: {self.get_sign(ephemery_string)}")
+        print(f"Degree: {self.get_degree(ephemery_string)}")
+    
     
 
 # Global variables
@@ -290,4 +299,5 @@ class AstrologyCalculator:
 
 ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 ac.import_ephemeris()
-ac.log_ephemeris()
+test_ephemery_string = ac.ephemeris_data[0][3]
+ac.test_getters(test_ephemery_string)
