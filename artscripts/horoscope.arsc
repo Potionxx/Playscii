@@ -262,6 +262,12 @@ class AstrologyCalculator:
         deg = ephemery_string[:2]
         return(deg)
     
+    
+    def get_full_degree(self, ephemery_string): 
+        """Returns a < 360 degree position."""
+        zo = ephemery_string[2:4]
+        return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
+    
 
     def test_getters(self, ephemery_string):
         """This method is for testing the get_sign_abreve, get_sign, and get_degree methods.
@@ -270,7 +276,7 @@ class AstrologyCalculator:
         print(f"Sign abreviation: {self.get_sign_abreve(ephemery_string)}")
         print(f"Sign full name: {self.get_sign(ephemery_string)}")
         print(f"Degree: {self.get_degree(ephemery_string)}")
-    
+        print(f"Full degree: {self.get_full_degree(ephemery_string)}")
     
 
 # Global variables
