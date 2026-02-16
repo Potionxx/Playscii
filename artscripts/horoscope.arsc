@@ -322,6 +322,21 @@ class AstrologyCalculator:
         return organized_natal_house_info
 
 
+    def degree_is_in_house(self, degree, house_info):
+        """This method tests if a degree is in a house"""
+        starting_degree = house_info["starting_degree"]
+        ending_degree = house_info["ending_degree"]
+
+        # If the house wraps around 0 degrees, then add 360 to the degree and ending degree to make the math work.
+        if starting_degree > ending_degree:
+            degree += 360
+            ending_degree += 360
+        
+        # Now do the test to see if the degree is in the house.
+        if degree in range(starting_degree, ending_degree):
+            return True
+
+
     def get_house_legacy(self, ephemery_string):
         """
         Finds the house a degree is in. 
@@ -400,3 +415,5 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 
 
 organized_natal_house_info = ac.organize_natal_house_info(ac.natal_houses, log=True)
+for house in organized_natal_house_info.values():
+    ac.degree_is_in_house(200, house)
