@@ -354,8 +354,8 @@ class AstrologyCalculator:
                 print(f"\tDegree {degree} is NOT in this house. Returning False.")
                 print("Finished Log for degree_is_in_house\n")
             return False
-
-
+        
+        
     def get_house(self, ephemery_string, organized_natal_house_info):
         """This method finds the house a degree is in. 
         
@@ -481,6 +481,45 @@ class AstrologyCalculator:
         return planet_info
 
 
+    def organize_aspect_info(self, planet_info1, planet_info2, aspect_name, log=False):
+        aspect_info = {
+            "degree_1": planet_info1["degree"],
+            "planet_1": planet_info1["planet"],
+            "zodiac_1": planet_info1["sign"],
+            "house_1": planet_info1["house"],
+            "station_1": planet_info1["retrograde"],
+
+            "aspect": aspect_name,
+
+            "degree_2": planet_info2["degree"],
+            "planet_2": planet_info2["planet"],
+            "zodiac_2": planet_info2["sign"],
+            "house_2": planet_info2["house"],
+            "station_2": planet_info2["retrograde"],
+            "important": None # Place holder imporant tranist symbol. 
+        }
+        if log == True:
+            print(f"\nOrganizing aspect info for {planet_info1['planet']} and {planet_info2['planet']}")
+            left_side = [
+                f"Degree: {aspect_info['degree_1']}",
+                f"Planet: {aspect_info['planet_1']}",
+                f"Zodiac: {aspect_info['zodiac_1']}",
+                f"House: {aspect_info['house_1']}",
+                f"Station: {aspect_info['station_1']}"
+            ]
+            right_side = [
+                f"Degree: {aspect_info['degree_2']}",
+                f"Planet: {aspect_info['planet_2']}",
+                f"Zodiac: {aspect_info['zodiac_2']}",
+                f"House: {aspect_info['house_2']}",
+                f"Station: {aspect_info['station_2']}"
+            ]
+            print(f"Aspect: {aspect_info['aspect']}")
+            for left, right in zip(left_side, right_side):
+                print(f"{left}\t\t{right}")
+            print("Finished organizing aspect info\n")
+
+
     def organize_day_ephemeris(
             self, 
             ephemeris_data, 
@@ -524,12 +563,18 @@ class AstrologyCalculator:
 
 
 ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
-# ac.import_ephemeris()
 
 
 ac.import_ephemeris()
-day_ephemeris = ac.ephemeris_data[0]
-organized_natal_house_info = ac.organize_natal_house_info(NATAL_HOUSES, log=True)
-# ac.organize_planet_ephemeris("sun", "12AQ07", organized_natal_house_info, log=True)
-ac.organize_day_ephemeris(day_ephemeris, log=True)
+
+organized_natal_house_info = ac.organize_natal_house_info(NATAL_HOUSES)
+
+moon_info = ac.organize_planet_ephemeris("moon", "28LE05", organized_natal_house_info)
+
+saturn_info = ac.organize_planet_ephemeris("saturn", "28PI50", organized_natal_house_info)
+
+aspect = ac.check_aspect("28LE05", "28PI50", orb=0)
+aspect_info = ac.organize_aspect_info(moon_info, saturn_info, aspect, log=True)
+
+
 
