@@ -319,19 +319,41 @@ class AstrologyCalculator:
         return organized_natal_house_info
 
 
-    def degree_is_in_house(self, degree, house_info):
+    def degree_is_in_house(self, degree, house_info, log=False):
         """This method tests if a degree is in a house"""
+        if log == True:
+            print("\nBegin Log for degree_is_in_house:")
         starting_degree = house_info["starting_degree"]
         ending_degree = house_info["ending_degree"]
+        if log == True:
+            print(f"Testing what house degree {degree} is in:")
+            print("\tHouse range:")
+            print(f"\t{starting_degree}---------{ending_degree}")
+
 
         # If the house wraps around 0 degrees, then add 360 to the degree and ending degree to make the math work.
         if starting_degree > ending_degree:
-            degree += 360
+            if degree < 180: # Only adjust the degree if it's in the first half of the zodiac, otherwise it will be correct as is.
+                degree += 360
             ending_degree += 360
+            if log == True:
+                print(f"\tHouse wraps around 0 degrees, adjusting degree and ending degree for testing:")
+                print(f"\tAdjusted Testing Degree: {degree}")
+                print(f"\tAdjusted Ending Degree: {ending_degree}")
         
         # Now do the test to see if the degree is in the house.
+        if log == True:
+            print(f"\tTesting if {degree} in range({starting_degree}, {ending_degree})")
         if degree in range(starting_degree, ending_degree):
+            if log == True:
+                print(f"\tDegree {degree} is in this house. Returning True.")
+                print("Finished Log for degree_is_in_house\n")
             return True
+        else:
+            if log == True:
+                print(f"\tDegree {degree} is NOT in this house. Returning False.")
+                print("Finished Log for degree_is_in_house\n")
+            return False
 
 
     def get_house(self, ephemery_string, organized_natal_house_info):
