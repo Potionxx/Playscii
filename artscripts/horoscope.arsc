@@ -350,6 +350,19 @@ class AstrologyCalculator:
         for house_number, house_info in organized_natal_house_info.items():
             if self.degree_is_in_house(degree, house_info):
                 return(house_number)
+            
+    def check_retro(self, ephemery_string):
+        """Returns 'R' for retrograde and ' ' for direct.""" 
+        try:
+            if ephemery_string[6] == "r":
+                return('R')
+            elif ephemery_string[6] == " ":
+                return(" ")
+            else:
+                print(f"check retro function behaving weird.")
+                print(f"ephemery_string[6] is '{ephemery_string[6]}'")
+        except IndexError:
+            return(" ")
     
 
     def test_getters(self, ephemery_string):
@@ -360,6 +373,7 @@ class AstrologyCalculator:
         print(f"Sign full name: {self.get_sign(ephemery_string)}")
         print(f"Degree: {self.get_degree(ephemery_string)}")
         print(f"Full degree: {self.get_full_degree(ephemery_string)}")
+        print(f"Retrograde: {self.check_retro(ephemery_string)}")
 
         organized_natal_house_info = self.organize_natal_house_info(self.natal_houses)
         print(f"House: {self.get_house(ephemery_string, organized_natal_house_info)}")
