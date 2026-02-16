@@ -350,44 +350,6 @@ class AstrologyCalculator:
         for house_number, house_info in organized_natal_house_info.items():
             if self.degree_is_in_house(degree, house_info):
                 return(house_number)
-            
-
-    def get_house_legacy(self, ephemery_string):
-        """
-        Finds the house a degree is in. 
-        
-        PARAMETERS:
-        ephemery_string -- The 6 char string from the CSV file.
-        
-        RETURNS:
-        A string like "ROMAN 1". 
-        This is used with the char names dict to get the capitlized roman numeral glyph.
-        """
-        degree = int(self.get_full_degree(ephemery_string))
-        for count, value in enumerate(self.natal_houses):
-            value = self.get_full_degree(value)
-            first_house_deg = self.get_full_degree(self.natal_houses[0]) 
-            if count < 11: # Prevents an index error at the last index
-                next_house_deg = self.get_full_degree(self.natal_houses[count+1])
-                if value < next_house_deg: # If the house isn't wrapping around 0 
-                    if degree in range(value, next_house_deg):
-                        return(f"ROMAN_{count+1}")
-                else:
-                    if degree >= value:
-                        return(f"ROMAN_{count+1}") 
-                    if degree < next_house_deg:
-                        return(f"ROMAN_{count+1}")
-            # If this is the 12th house, then repeat the above process, but comparing the 12th house to the 1st House
-            if count == 11: 
-                if value < first_house_deg:
-                    if degree in range(value, first_house_deg):
-                        return(f"ROMAN_{count+1}")
-                else:
-                    if degree >= value:
-                        return(f"ROMAN_{count+1}") 
-                    if degree < first_house_deg:
-                        return(f"ROMAN_{count+1}")       
-
     
 
     def test_getters(self, ephemery_string):
