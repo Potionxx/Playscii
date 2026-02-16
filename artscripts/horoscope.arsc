@@ -416,6 +416,22 @@ class AstrologyCalculator:
         for every45degrees in range(8):
             if (every45degrees + 1) * 45 > moondeg - sundeg >= every45degrees * 45:
                 return every45degrees
+            
+
+    def check_dignity(self, planet, ephemery_string):
+        """
+        Returns a planets dignity status when in a certain sign.
+        """
+        sign = self.get_sign(ephemery_string)
+        if self.DOMICILE_DICT.get(sign) == planet:
+            return "Dom"
+        if self.DETRIMENT_DICT.get(sign) == planet:
+            return "Det"
+        if self.EXALTATION_DICT.get(sign) == planet:
+            return "Exa"
+        if self.FALL_DICT.get(sign) == planet:
+            return "Fal"
+        return " "
     
 
 # Global variables
@@ -446,6 +462,7 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 # ac.import_ephemeris()
 
 
-moon_phase = ac.check_moon_phase("15TA23", "15SC23")
-print(f"Moon phase: {moon_phase}")
+dignity = ac.check_dignity("sun", "15TA23")
+print(f"Dignity: {dignity}")
+
 
