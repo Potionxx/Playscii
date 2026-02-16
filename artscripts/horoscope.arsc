@@ -363,6 +363,30 @@ class AstrologyCalculator:
                 print(f"ephemery_string[6] is '{ephemery_string[6]}'")
         except IndexError:
             return(" ")
+        
+
+    def check_aspect(self, ephemery_string1, ephemery_string2, orb=0):
+        """Two ephemery strings are compared and the aspect name is returned if there is one."""
+
+        degree_1 = self.get_full_degree(ephemery_string1)
+        degree_2 = self.get_full_degree(ephemery_string2)
+        
+        # Checks to see if we're accidentaly measuring the degree from the outside of the angle.
+        if abs(degree_1 - degree_2) > 180:
+            check_this_degree = 360 - abs(degree_1 - degree_2)
+
+        # Otherwise, just measure the degree as normal.
+        else:
+            check_this_degree = abs(degree_1 - degree_2)      
+            
+        # Formats for angles covering the 359 to 0 range
+        for aspect_degree, aspect_name in self.ASPECT_DEGREES.items():
+            lower_bound = check_this_degree - orb
+            upper_bound = check_this_degree + orb
+            aspect_degree = aspect_degree
+
+            if aspect_degree in range(lower_bound, upper_bound + 1):
+                return(aspect_name)
     
 
     def test_getters(self, ephemery_string):
@@ -406,5 +430,10 @@ class AstrologyCalculator:
 ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 # ac.import_ephemeris()
 
-ac.test_getters("15AR23")
+for i in range(30):
+    n = str(i)
+    if len(n) == 1:
+        n = "0" + n
+    aspect = ac.check_aspect(f"{n}TA23", f"{n}AQ23", orb=0)
+    print(f"Aspect for {n}: {aspect}")
 
