@@ -434,6 +434,45 @@ class AstrologyCalculator:
         return " "
     
 
+    def organize_planet_ephemeris(
+            self, 
+            planet, 
+            ephemery_string, 
+            organized_natal_house_info, 
+            log=False):
+        """This method organizes the ephemeris data for a single planet into a dictionary. 
+        It uses the get_sign, get_degree, get_house, check_retro, and check_dignity methods to get the necessary information.
+        """
+        planet_info = {
+            "sign": self.get_sign(ephemery_string),
+            "degree": self.get_degree(ephemery_string),
+            "house": self.get_house(ephemery_string, organized_natal_house_info),
+            "retrograde": self.check_retro(ephemery_string),
+            "dignity": self.check_dignity(planet, ephemery_string)
+        }
+        if log == True:
+            print(f"Organizing ephemeris data for planet: {planet}")
+            for key, value in planet_info.items():
+                print(f"{key}: {value}")
+            print("Finished organizing planet ephemeris\n")
+        return planet_info
+
+
+    def organize_day_ephemeris(
+            self, 
+            ephemeris_data, 
+            offset_date=0, 
+            offset_time=0, 
+            log=False):
+        """This method organizes the ephemeris data for a single day into a dictionary. 
+        
+        Offset date and time are for adjusting for different time zones.
+        """
+        if log == True:
+            print(f"Organizing ephemeris data for date: {self.year_month}-{offset_date} with time offset of {offset_time} hours.")
+
+            for item in ephemeris_data:
+                print(item)
     
         
 
@@ -466,8 +505,8 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 
 
 ac.import_ephemeris()
-# day_ephemeris = ac.ephemeris_data[0]
+day_ephemeris = ac.ephemeris_data[0]
 organized_natal_house_info = ac.organize_natal_house_info(NATAL_HOUSES, log=True)
-ac.organize_planet_ephemeris("sun", "12AQ07", organized_natal_house_info, log=True)
-
+# ac.organize_planet_ephemeris("sun", "12AQ07", organized_natal_house_info, log=True)
+ac.organize_day_ephemeris(day_ephemeris, log=True)
 
