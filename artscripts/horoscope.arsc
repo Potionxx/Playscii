@@ -287,10 +287,8 @@ class AstrologyCalculator:
             house_info = natal_houses[house_index]
 
             # Decide what the next house is.
-
             if house_number < 12: # If house_number is NOT the last house... 
                 next_house_info = natal_houses[house_index+1] # use the next highest index
-
             elif house_number == 12: # If house_number IS the last house... 
                 next_house_info = natal_houses[0] # set next_house_info to the first house.
 
@@ -318,7 +316,6 @@ class AstrologyCalculator:
                 print(f"\tStarting Degree: {starting_degree}")
                 print(f"\tEnding Degree: {ending_degree}")
             print("Finished printing organized house info\n")
-
         return organized_natal_house_info
 
 
@@ -336,6 +333,24 @@ class AstrologyCalculator:
         if degree in range(starting_degree, ending_degree):
             return True
 
+
+    def get_house(self, ephemery_string, organized_natal_house_info):
+        """This method finds the house a degree is in. 
+        
+        PARAMETERS:
+        ephemery_string -- The 6 char string from the CSV file.
+        organized_natal_house_info -- The dictionary returned by the organize_natal_house_info method.
+        
+        RETURNS:
+        A string like "1". 
+        """
+        degree = int(self.get_full_degree(ephemery_string))
+
+        # Loop through every house and return the number if degree_is_in_house returns True.
+        for house_number, house_info in organized_natal_house_info.items():
+            if self.degree_is_in_house(degree, house_info):
+                return(house_number)
+            
 
     def get_house_legacy(self, ephemery_string):
         """
@@ -415,5 +430,5 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 
 
 organized_natal_house_info = ac.organize_natal_house_info(ac.natal_houses, log=True)
-for house in organized_natal_house_info.values():
-    ac.degree_is_in_house(200, house)
+house = ac.get_house("26GE", organized_natal_house_info)
+print(f"26GE is in House: {house}")
