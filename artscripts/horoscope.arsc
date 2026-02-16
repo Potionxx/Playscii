@@ -360,7 +360,9 @@ class AstrologyCalculator:
         print(f"Sign full name: {self.get_sign(ephemery_string)}")
         print(f"Degree: {self.get_degree(ephemery_string)}")
         print(f"Full degree: {self.get_full_degree(ephemery_string)}")
-        print(f"House: {self.get_house_legacy(ephemery_string)}")
+
+        organized_natal_house_info = self.organize_natal_house_info(self.natal_houses)
+        print(f"House: {self.get_house(ephemery_string, organized_natal_house_info)}")
     
 
 # Global variables
@@ -390,7 +392,5 @@ class AstrologyCalculator:
 ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 # ac.import_ephemeris()
 
+ac.test_getters("15AR23")
 
-organized_natal_house_info = ac.organize_natal_house_info(ac.natal_houses, log=True)
-house = ac.get_house("26GE", organized_natal_house_info)
-print(f"26GE is in House: {house}")
