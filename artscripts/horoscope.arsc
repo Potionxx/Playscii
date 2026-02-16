@@ -247,7 +247,7 @@ class AstrologyCalculator:
         If the ephemery string is "15AR23", this method will return "Aries".
         """
         abrev = self.get_sign_abreve(ephemery_string)
-        full_sign_name = AstrologyCalculator.ZODIAC_ABRIVIATIONS[abrev]
+        full_sign_name = self.ZODIAC_ABRIVIATIONS[abrev]
         return(full_sign_name)  
     
 
@@ -266,7 +266,7 @@ class AstrologyCalculator:
     def get_full_degree(self, ephemery_string): 
         """Returns a < 360 degree position."""
         zo = ephemery_string[2:4]
-        return(AstrologyCalculator.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
+        return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
 
 
     def organize_natal_house_info(self, natal_houses, log=False):
@@ -381,7 +381,7 @@ class AstrologyCalculator:
             check_this_degree = abs(degree_1 - degree_2)      
             
         # Formats for angles covering the 359 to 0 range
-        for aspect_degree, aspect_name in AstrologyCalculator.ASPECT_DEGREES.items():
+        for aspect_degree, aspect_name in self.ASPECT_DEGREES.items():
             lower_bound = check_this_degree - orb
             upper_bound = check_this_degree + orb
             aspect_degree = aspect_degree
@@ -423,16 +423,19 @@ class AstrologyCalculator:
         Returns a planets dignity status when in a certain sign.
         """
         sign = self.get_sign(ephemery_string)
-        if AstrologyCalculator.DOMICILE_DICT.get(sign) == planet:
+        if self.DOMICILE_DICT.get(sign) == planet:
             return "Dom"
-        if AstrologyCalculator.DETRIMENT_DICT.get(sign) == planet:
+        if self.DETRIMENT_DICT.get(sign) == planet:
             return "Det"
-        if AstrologyCalculator.EXALTATION_DICT.get(sign) == planet:
+        if self.EXALTATION_DICT.get(sign) == planet:
             return "Exa"
-        if AstrologyCalculator.FALL_DICT.get(sign) == planet:
+        if self.FALL_DICT.get(sign) == planet:
             return "Fal"
         return " "
     
+
+    
+        
 
 # Global variables
 #    colors
@@ -462,7 +465,9 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 # ac.import_ephemeris()
 
 
-dignity = ac.check_dignity("sun", "15TA23")
-print(f"Dignity: {dignity}")
+ac.import_ephemeris()
+# day_ephemeris = ac.ephemeris_data[0]
+organized_natal_house_info = ac.organize_natal_house_info(NATAL_HOUSES, log=True)
+ac.organize_planet_ephemeris("sun", "12AQ07", organized_natal_house_info, log=True)
 
 
