@@ -470,7 +470,8 @@ class AstrologyCalculator:
             "degree": self.get_degree(ephemery_string),
             "house": self.get_house(ephemery_string, organized_natal_house_info),
             "retrograde": self.check_retro(ephemery_string),
-            "dignity": self.check_dignity(planet, ephemery_string)
+            "dignity": self.check_dignity(planet, ephemery_string),
+            "planet": planet
         }
         if log == True:
             print(f"Organizing ephemeris data for planet: {planet}")
