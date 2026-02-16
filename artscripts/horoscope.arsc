@@ -351,6 +351,7 @@ class AstrologyCalculator:
             if self.degree_is_in_house(degree, house_info):
                 return(house_number)
             
+
     def check_retro(self, ephemery_string):
         """Returns 'R' for retrograde and ' ' for direct.""" 
         try:
@@ -401,6 +402,20 @@ class AstrologyCalculator:
 
         organized_natal_house_info = self.organize_natal_house_info(self.natal_houses)
         print(f"House: {self.get_house(ephemery_string, organized_natal_house_info)}")
+
+
+    def check_moon_phase(self, sundeg, moondeg):
+        """The sun and moon degrees are used to calculate the moon phase"""
+        #the degree is turned into a 0 < 360 position
+        sundeg = self.get_full_degree(sundeg)
+        moondeg = self.get_full_degree(moondeg)
+        #formats to avoid negative or obtuse angles
+        if moondeg - sundeg < 0:
+            moondeg = moondeg + 360 
+        #returns phase as an int 0-7
+        for every45degrees in range(8):
+            if (every45degrees + 1) * 45 > moondeg - sundeg >= every45degrees * 45:
+                return every45degrees
     
 
 # Global variables
@@ -430,10 +445,7 @@ class AstrologyCalculator:
 ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 # ac.import_ephemeris()
 
-for i in range(30):
-    n = str(i)
-    if len(n) == 1:
-        n = "0" + n
-    aspect = ac.check_aspect(f"{n}TA23", f"{n}AQ23", orb=0)
-    print(f"Aspect for {n}: {aspect}")
+
+moon_phase = ac.check_moon_phase("15TA23", "15SC23")
+print(f"Moon phase: {moon_phase}")
 
