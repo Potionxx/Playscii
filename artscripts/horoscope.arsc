@@ -475,8 +475,9 @@ class AstrologyCalculator:
         }
         if log == True:
             print(f"Organizing ephemeris data for planet: {planet}")
+            print(f"\tEphemery string: {ephemery_string}")
             for key, value in planet_info.items():
-                print(f"{key}: {value}")
+                print(f"\t{key}: {value}")
             print("Finished organizing planet ephemeris\n")
         return planet_info
 
