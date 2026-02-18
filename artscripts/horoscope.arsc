@@ -615,6 +615,8 @@ class AstrologyCalculator:
         # Handling time zones and daylight savings time
         date_in_time_zone = self.handle_timezones_and_dst(date_at_00_ut)
 
+        weekday_name = date_in_time_zone.strftime('%A')
+    
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
                 organized_natal_house_info, 
@@ -623,7 +625,7 @@ class AstrologyCalculator:
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
             "date_at_local_time": date_in_time_zone,
-            "weekday_name": "TODO",
+            "weekday_name": weekday_name,
             "day_ruling_planet" : "TODO",
             "month_name": "TODO",
             "season_name": "TODO",
