@@ -602,6 +602,16 @@ class AstrologyCalculator:
         else: 
             print(f"Invalid month: {month}")
 
+
+    def is_equinox_or_solstice(self, sun_planet_info):
+        """This method checks if the sun is at 0 degrees of a cardinal sign, which would indicate an equinox or solstice."""
+        if sun_planet_info["degree"] == "00" and sun_planet_info["sign"] in ["aries", "libra"]:
+            return "equinox"
+        elif sun_planet_info["degree"] == "00" and sun_planet_info["sign"] in ["cancer", "capricorn"]:
+            return "solstice"
+        else: 
+            return ""
+
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
@@ -630,8 +640,9 @@ class AstrologyCalculator:
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
                 organized_natal_house_info, 
-                log=log)
           
+        equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
+
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
             "date_at_local_time": date_in_time_zone,
@@ -639,7 +650,7 @@ class AstrologyCalculator:
             "day_ruling_planet" : day_ruling_planet,
             "month_name": month_name,
             "season_name": season_name,
-            "equinox_or_solstice": "TODO",
+            "equinox_or_solstice": equinox_or_solstice,
             "all_planet_positions": all_planet_info_for_day,
             "transits_aspecting_each_other": "TODO",
             "transits_aspecting_natal": "TODO",
