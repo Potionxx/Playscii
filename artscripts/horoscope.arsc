@@ -19,6 +19,10 @@ EPHEMERIS CSV FILE:
 
 class AstrologyCalculator:
     """This class will contain all the methods for calculating astrological information based on the natal chart."""
+    TIMEZONES = {
+        "UT": 0,
+        "central": -6,
+    }
     PLANET_DICT = {
         1: "sun",
         2: "moon",
@@ -170,7 +174,7 @@ class AstrologyCalculator:
         "Sa": "Saturday",
         "Su": "Sunday"
     }
-    def __init__(self, natal_planets, natal_houses, year_month):
+    def __init__(self, natal_planets, natal_houses, year_month, timezone="central"):
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
         self.year_month = year_month
@@ -178,6 +182,16 @@ class AstrologyCalculator:
         self.year = int(year_month[0:4])    
         self.ephemeris_data = []
         self.test_natal_data()
+        self.import_ephemeris()
+        self.timezone = timezone
+        self.check_timezone()
+
+
+    def check_timezone(self):  
+        if self.timezone not in self.TIMEZONES:
+            print(f"Timezone '{self.timezone}' not found in TIMEZONES dictionary. Defaulting to 'central'.")
+            self.timezone = "UT"
+
 
     def test_natal_data(self):
         "This method is for testing the imported natal data. It will print the natal planets and houses to the console."
@@ -538,6 +552,36 @@ class AstrologyCalculator:
         return all_planet_info_for_day
     
 
+    def find_2nd_sunday_in_march(self, year):
+        from datetime import datetime, timedelta
+        # Find first Sunday in March, then add 7 days
+        first_of_march = datetime(year, 3, 1)
+        first_sunday = first_of_march + timedelta(days=(6 - first_of_march.weekday()) % 7)
+        second_sunday = first_sunday + timedelta(days=7)
+        return second_sunday
+    
+
+    def find_1st_sunday_in_november(self, year):
+        from datetime import datetime, timedelta
+        # Find first Sunday in November
+        first_of_november = datetime(year, 11, 1)
+        first_sunday = first_of_november + timedelta(days=(6 - first_of_november.weekday()) % 7)
+        return first_sunday
+    
+
+    def daylight_savings_time_offset(self, date):
+        """This method finds the daylight savings time offset for a given date. 
+        
+        It returns 1 for daylight savings time, and 0 for standard time.
+        In the US, daylight savings time starts on the second Sunday in March and ends on the first Sunday in November."""
+        second_sunday_in_march = self.find_2nd_sunday_in_march(self.year)
+        first_sunday_in_november = self.find_1st_sunday_in_november(self.year)
+
+        if second_sunday_in_march <= date < first_sunday_in_november:
+            return 1
+        else:
+            return 0
+
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
@@ -555,14 +599,22 @@ class AstrologyCalculator:
         date_number = int(date_string[3:5])
         date_at_00_ut = datetime(self.year, self.month_num, date_number)
 
+        # Handling time zones
+        timezone_offset = self.TIMEZONES[self.timezone]
+        date_in_time_zone = date_at_00_ut + timedelta(hours=timezone_offset)
+        
+        # Handling daylight savings time
+        dst_offset = self.daylight_savings_time_offset(date_in_time_zone)
+        date_in_time_zone = date_in_time_zone + timedelta(hours=dst_offset)
+
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
                 organized_natal_house_info, 
-                log=False)
-        
+                log=log)
+          
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
-            "date_at_local_time": "TODO",
+            "date_at_local_time": date_in_time_zone,
             "weekday_name": "TODO",
             "day_ruling_planet" : "TODO",
             "month_name": "TODO",
