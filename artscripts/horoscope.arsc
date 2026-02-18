@@ -540,21 +540,51 @@ class AstrologyCalculator:
 
     def organize_day_ephemeris(
             self, 
-            ephemeris_data, 
-            offset_date=0, 
+            single_day_ephemeris_data,
+            organized_natal_house_info, 
             offset_time=0, 
             log=False):
         """This method organizes the ephemeris data for a single day into a dictionary. 
         
         Offset date and time are for adjusting for different time zones.
-        """
-        if log == True:
-            print(f"Organizing ephemeris data for date: {self.year_month}-{offset_date} with time offset of {offset_time} hours.")
 
-            for item in ephemeris_data:
-                print(item)
-    
+        TODO The returned dictionary should also include aspect information.
+        """
+
+        all_planet_info_for_day = self.organize_all_planets_info_for_day(
+                single_day_ephemeris_data, 
+                organized_natal_house_info, 
+                log=log)
         
+        complete_day_dict = {
+            "Date at 00:00 UT": "TODO",
+            "Date at local time": "TODO",
+            "all_planet_positions": all_planet_info_for_day,
+            "transits_aspecting_each_other": "TODO",
+            "transits_aspecting_natal": "TODO",
+            "weekday_name": "TODO",
+            "day_ruling_planet" : "TODO", 
+            "moon_phase_index": "TODO",
+            "moon_phase_first_word": "TODO",
+            "moon_phase_second_word": "TODO",
+        }
+        
+        if log == True:
+            print(f"\nOrganized ephemeris data for the day:")
+            for key, value in complete_day_dict.items():
+                if key == "all_planet_positions":
+                    print(f"\t{key}:")
+                    for planet, planet_info in value.items():
+                        print(f"\t\t{planet}:")
+                        for info_key, info_value in planet_info.items():
+                            print(f"\t\t\t{info_key}: {info_value}")
+                else:
+                    print(f"\t{key}: {value}")
+            print("Finished organizing day ephemeris\n")
+        return complete_day_dict
+        
+
+
 
 # Global variables
 #    colors
@@ -586,13 +616,9 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH)
 ac.import_ephemeris()
 
 organized_natal_house_info = ac.organize_natal_house_info(NATAL_HOUSES)
+day_1 = ac.ephemeris_data[0]
+ac.organize_day_ephemeris(day_1, organized_natal_house_info, log=True)
 
-moon_info = ac.organize_planet_ephemeris("moon", "28LE05", organized_natal_house_info)
-
-saturn_info = ac.organize_planet_ephemeris("saturn", "28PI50", organized_natal_house_info)
-
-aspect = ac.check_aspect("28LE05", "28PI50", orb=0)
-aspect_info = ac.organize_aspect_info(moon_info, saturn_info, aspect, log=True)
 
 
 
