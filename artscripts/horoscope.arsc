@@ -520,6 +520,23 @@ class AstrologyCalculator:
                 print(f"{left}\t\t{right}")
             print("Finished organizing aspect info\n")
 
+    
+    def organize_all_planets_info_for_day(self, single_day_ephemeris_data, organized_natal_house_info, log=False):
+        """This method organizes the ephemeris data for a single day into a dictionary.
+        
+        single_day_ephemeris_data is one row of the ephemeris data imported from the csv file."""
+        all_planet_info_for_day = {}
+        for column, planet_name in self.PLANET_DICT.items():          
+            ephemery_string = single_day_ephemeris_data[column]
+            planet_info = self.organize_planet_ephemeris(
+                    planet_name,
+                    ephemery_string,
+                    organized_natal_house_info,
+                    log=log
+            )
+            all_planet_info_for_day[planet_name] = planet_info
+        return all_planet_info_for_day
+    
 
     def organize_day_ephemeris(
             self, 
