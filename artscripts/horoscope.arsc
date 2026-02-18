@@ -582,6 +582,19 @@ class AstrologyCalculator:
         else:
             return 0
 
+
+    def handle_timezones_and_dst(self, date_at_00_ut):
+        """This method adjusts a date for the timezone and daylight savings time."""
+        from datetime import timedelta
+        timezone_offset = self.TIMEZONES[self.timezone]
+        date_in_time_zone = date_at_00_ut + timedelta(hours=timezone_offset)
+        
+        dst_offset = self.daylight_savings_time_offset(date_in_time_zone)
+        date_in_time_zone = date_in_time_zone + timedelta(hours=dst_offset)
+
+        return date_in_time_zone
+    
+    
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
@@ -599,13 +612,8 @@ class AstrologyCalculator:
         date_number = int(date_string[3:5])
         date_at_00_ut = datetime(self.year, self.month_num, date_number)
 
-        # Handling time zones
-        timezone_offset = self.TIMEZONES[self.timezone]
-        date_in_time_zone = date_at_00_ut + timedelta(hours=timezone_offset)
-        
-        # Handling daylight savings time
-        dst_offset = self.daylight_savings_time_offset(date_in_time_zone)
-        date_in_time_zone = date_in_time_zone + timedelta(hours=dst_offset)
+        # Handling time zones and daylight savings time
+        date_in_time_zone = self.handle_timezones_and_dst(date_at_00_ut)
 
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
