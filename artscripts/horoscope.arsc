@@ -174,8 +174,8 @@ class AstrologyCalculator:
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
         self.year_month = year_month
-        self.month_num = year_month[5:7]
-        self.year = year_month[0:4]    
+        self.month_num = int(year_month[5:7])
+        self.year = int(year_month[0:4])    
         self.ephemeris_data = []
         self.test_natal_data()
 
@@ -550,15 +550,19 @@ class AstrologyCalculator:
 
         TODO The returned dictionary should also include aspect information.
         """
+        from datetime import datetime, timedelta
+        date_string = single_day_ephemeris_data[0]
+        date_number = int(date_string[3:5])
+        date_at_00_ut = datetime(self.year, self.month_num, date_number)
 
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
                 organized_natal_house_info, 
-                log=log)
+                log=False)
         
         complete_day_dict = {
-            "Date at 00:00 UT": "TODO",
-            "Date at local time": "TODO",
+            "date_at_00:00 UT": date_at_00_ut,
+            "date_at_local_time": "TODO",
             "weekday_name": "TODO",
             "day_ruling_planet" : "TODO",
             "month_name": "TODO",
