@@ -157,23 +157,16 @@ class AstrologyCalculator:
         "chiron":179,
     }
     WEEKDAY_RULING_PLANETS = {
-        "Mo": CHAR_NAMES["moon"],
-        "Tu": CHAR_NAMES["mars"],
-        "We": CHAR_NAMES["mercury"],
-        "Th": CHAR_NAMES["jupiter"],
-        "Fr": CHAR_NAMES["venus"],
-        "Sa": CHAR_NAMES["saturn"],
-        "Su": CHAR_NAMES["sun"]
+        "Monday": "moon",
+        "Tuesday": "mars",
+        "Wednesday": "mercury",
+        "Thursday": "jupiter",
+        "Friday": "venus",
+        "Saturday": "saturn",
+        "Sunday": "sun"
     }
-    WEEKDAY_NAMES = {
-        "Mo": "Monday",
-        "Tu": "Tuesday",
-        "We": "Wednesday",
-        "Th": "Thursday",
-        "Fr": "Friday",
-        "Sa": "Saturday",
-        "Su": "Sunday"
-    }
+
+
     def __init__(self, natal_planets, natal_houses, year_month, timezone="central"):
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
