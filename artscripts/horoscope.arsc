@@ -587,7 +587,21 @@ class AstrologyCalculator:
 
         return date_in_time_zone
     
-    
+    def get_season(self, date):
+        """Returns the season name based on the month."""
+        month = date.month
+        
+        if month in [3, 4, 5]:
+            return "Spring"
+        elif month in [6, 7, 8]:
+            return "Summer"
+        elif month in [9, 10, 11]:
+            return "Fall"
+        elif month in [12, 1, 2]:
+            return "Winter"
+        else: 
+            print(f"Invalid month: {month}")
+
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
@@ -609,7 +623,10 @@ class AstrologyCalculator:
         date_in_time_zone = self.handle_timezones_and_dst(date_at_00_ut)
 
         weekday_name = date_in_time_zone.strftime('%A')
-    
+        day_ruling_planet = self.WEEKDAY_RULING_PLANETS[weekday_name]
+        month_name = date_in_time_zone.strftime('%B')
+        season_name = self.get_season(date_in_time_zone)
+
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
                 organized_natal_house_info, 
@@ -619,9 +636,9 @@ class AstrologyCalculator:
             "date_at_00:00 UT": date_at_00_ut,
             "date_at_local_time": date_in_time_zone,
             "weekday_name": weekday_name,
-            "day_ruling_planet" : "TODO",
-            "month_name": "TODO",
-            "season_name": "TODO",
+            "day_ruling_planet" : day_ruling_planet,
+            "month_name": month_name,
+            "season_name": season_name,
             "equinox_or_solstice": "TODO",
             "all_planet_positions": all_planet_info_for_day,
             "transits_aspecting_each_other": "TODO",
