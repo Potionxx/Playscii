@@ -600,9 +600,7 @@ class AstrologyCalculator:
         print(f"Degree: {self.get_degree(ephemery_string)}")
         print(f"Full degree: {self.get_full_degree(ephemery_string)}")
         print(f"Retrograde: {self.check_retro(ephemery_string)}")
-
-        organized_natal_house_info = self.organize_natal_house_info(self.natal_houses)
-        print(f"House: {self.get_house(ephemery_string, organized_natal_house_info)}")
+        print(f"House: {self.get_house(ephemery_string)}")
 
 
     def check_moon_phase(self, sundeg, moondeg):
@@ -765,7 +763,8 @@ class AstrologyCalculator:
         date_in_time_zone = date_in_time_zone + timedelta(hours=dst_offset)
 
         return date_in_time_zone
-    
+
+
     def get_season(self, date):
         """Returns the season name based on the month."""
         month = date.month
@@ -790,6 +789,7 @@ class AstrologyCalculator:
             return "solstice"
         else: 
             return ""
+
 
     def organize_day_ephemeris(
             self, 
@@ -818,7 +818,7 @@ class AstrologyCalculator:
 
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
-                organized_natal_house_info, 
+                log=False)
           
         equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
 
