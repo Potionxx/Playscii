@@ -167,6 +167,7 @@ class AstrologyCalculator:
     }
 
 
+    def __init__(self, natal_planets, natal_houses, year_month, timezone="central", log=False):
         print("\nInitializing AstrologyCalculator class.")
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
@@ -178,6 +179,7 @@ class AstrologyCalculator:
         self.import_ephemeris(log)
         self.timezone = timezone
         self.check_timezone()
+        self.organize_natal_house_info(log)
         print("Finished initializing AstrologyCalculator class.\n\n\n")
 
     
