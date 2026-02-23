@@ -299,8 +299,8 @@ class AstrologyCalculator:
         return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
 
 
-    def organize_natal_house_info(self, natal_houses, log=False):
-        """This method returns a dictionary with the starting and ending degree of each house.
+    def organize_natal_house_info(self, log=False):
+        """This method saves a dictionary with the starting and ending degree of each house.
 
         To find the ending degree of a house, it looks at the starting degree of the next house.
         For the 12th house, the next house is the 1st house.
@@ -309,18 +309,18 @@ class AstrologyCalculator:
         """
         # Initialize variables and an empty dictionary to hold the organized house info.
         house_number = 1
-        organized_natal_house_info = {}
+        self.organized_natal_house_info = {}
 
         # Now, get info for each house
         for house_index in range(12):
             house_number = house_index+1 # Index (house_index) starts at 0 but house number starts at 1.
-            house_info = natal_houses[house_index]
+            house_info = self.natal_houses[house_index]
 
             # Decide what the next house is.
             if house_number < 12: # If house_number is NOT the last house... 
-                next_house_info = natal_houses[house_index+1] # use the next highest index
+                next_house_info = self.natal_houses[house_index+1] # use the next highest index
             elif house_number == 12: # If house_number IS the last house... 
-                next_house_info = natal_houses[0] # set next_house_info to the first house.
+                next_house_info = self.natal_houses[0] # set next_house_info to the first house.
 
             # Calculate the starting and ending degrees of the house
             starting_degree = self.get_full_degree(house_info)
@@ -333,20 +333,20 @@ class AstrologyCalculator:
             }
 
             # Then, save that small dictionary to a larger dictionary of all the houses, with house_number as the key.
-            organized_natal_house_info[house_number] = house_info
+            self.organized_natal_house_info[house_number] = house_info
 
         # If log was set to True, print the organized house info to the console for testing purposes.
         if log == True:
             print("\nPrinting organized natal house info:")
-            for house in organized_natal_house_info:
+            for house in self.organized_natal_house_info:
                 print(f"House: {house}")
-                house_dict = organized_natal_house_info[house]
+                house_dict = self.organized_natal_house_info[house]
                 starting_degree = house_dict["starting_degree"]
                 ending_degree = house_dict["ending_degree"]
                 print(f"\tStarting Degree: {starting_degree}")
                 print(f"\tEnding Degree: {ending_degree}")
             print("Finished printing organized house info\n")
-        return organized_natal_house_info
+
 
 
     def degree_is_in_house(self, degree, house_info, log=False):
