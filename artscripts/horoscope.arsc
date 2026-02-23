@@ -174,7 +174,7 @@ class AstrologyCalculator:
         self.month_num = int(year_month[5:7])
         self.year = int(year_month[0:4])    
         self.ephemeris_data = []
-        self.test_natal_data()
+        self.test_natal_data(log)
         self.import_ephemeris(log)
         self.timezone = timezone
         self.check_timezone()
@@ -205,7 +205,10 @@ class AstrologyCalculator:
             self.timezone = "UT"
 
 
-    def test_natal_data(self):
+    def test_natal_data(self, log=False):
+        if log == False:
+            return
+
         "This method is for testing the imported natal data. It will print the natal planets and houses to the console."
         print(f"Testing Natal Imports:")
         try:    
