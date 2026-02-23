@@ -873,6 +873,11 @@ class AstrologyCalculator:
         equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
         transits_aspecting_natal = self.get_all_natal_aspects_for_day(all_planet_info_for_day, self.orb, log)
         transits_aspecting_eachother = self.get_all_transit_only_aspects_for_day(all_planet_info_for_day, self.orb, log)
+        sun_ephemery_string = all_planet_info_for_day["sun"]["ephemery_string"]
+        moon_ephemery_string = all_planet_info_for_day["moon"]["ephemery_string"]
+        moon_phase = self.check_moon_phase(sun_ephemery_string, moon_ephemery_string)
+        moon_phase_first_word = self.MOON_PHASE_NAMES[moon_phase][0]
+        moon_phase_second_word = self.MOON_PHASE_NAMES[moon_phase][1]
         
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
@@ -885,9 +890,9 @@ class AstrologyCalculator:
             "all_planet_positions": all_planet_info_for_day,
             "transits_aspecting_each_other": transits_aspecting_eachother,
             "transits_aspecting_natal": transits_aspecting_natal,
-            "moon_phase_index": "TODO",
-            "moon_phase_first_word": "TODO",
-            "moon_phase_second_word": "TODO",
+            "moon_phase_index": moon_phase,
+            "moon_phase_first_word": moon_phase_first_word,
+            "moon_phase_second_word": moon_phase_second_word,
         }
         
         if log == True:
