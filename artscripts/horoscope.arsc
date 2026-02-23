@@ -383,7 +383,7 @@ class AstrologyCalculator:
             return False
         
         
-    def get_house(self, ephemery_string, organized_natal_house_info):
+    def get_house(self, ephemery_string):
         """This method finds the house a degree is in. 
         
         PARAMETERS:
@@ -396,7 +396,7 @@ class AstrologyCalculator:
         degree = int(self.get_full_degree(ephemery_string))
 
         # Loop through every house and return the number if degree_is_in_house returns True.
-        for house_number, house_info in organized_natal_house_info.items():
+        for house_number, house_info in self.organized_natal_house_info.items():
             if self.degree_is_in_house(degree, house_info):
                 return(house_number)
             
