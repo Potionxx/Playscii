@@ -167,7 +167,7 @@ class AstrologyCalculator:
     }
 
 
-    def __init__(self, natal_planets, natal_houses, year_month, timezone="central", log=False):
+    def __init__(self, natal_planets, natal_houses, year_month, timezone="central", orb=0, log=False):
         print("\nInitializing AstrologyCalculator class.")
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
@@ -178,6 +178,7 @@ class AstrologyCalculator:
         self.test_natal_data(log)
         self.import_ephemeris(log)
         self.timezone = timezone
+        self.orb = orb
         self.check_timezone()
         self.organize_natal_house_info(log)
         print("Finished initializing AstrologyCalculator class.\n\n\n")
@@ -759,7 +760,9 @@ class AstrologyCalculator:
 
 
     def handle_timezones_and_dst(self, date_at_00_ut):
-        """This method adjusts a date for the timezone and daylight savings time."""
+        """This method adjusts a date for the timezone and daylight savings time.
+        
+        The time zone is an instance variable that can be set when initializing the AstrologyCalculator class."""
         from datetime import timedelta
         timezone_offset = self.TIMEZONES[self.timezone]
         date_in_time_zone = date_at_00_ut + timedelta(hours=timezone_offset)
@@ -799,8 +802,6 @@ class AstrologyCalculator:
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
-            organized_natal_house_info, 
-            offset_time=0, 
             log=False):
         """This method organizes the ephemeris data for a single day into a dictionary. 
         
@@ -808,6 +809,7 @@ class AstrologyCalculator:
 
         TODO The returned dictionary should also include aspect information.
         """
+        self.log(log, "\nLogging organize_day_ephemeris:")
         from datetime import datetime, timedelta
         date_string = single_day_ephemeris_data[0]
         date_number = int(date_string[3:5])
@@ -826,6 +828,7 @@ class AstrologyCalculator:
                 log=False)
           
         equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
+        transits_aspecting_natal = self.get_all_natal_aspects_for_day(all_planet_info_for_day, self.orb, log)
 
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
@@ -837,7 +840,7 @@ class AstrologyCalculator:
             "equinox_or_solstice": equinox_or_solstice,
             "all_planet_positions": all_planet_info_for_day,
             "transits_aspecting_each_other": "TODO",
-            "transits_aspecting_natal": "TODO",
+            "transits_aspecting_natal": transits_aspecting_natal,
             "moon_phase_index": "TODO",
             "moon_phase_first_word": "TODO",
             "moon_phase_second_word": "TODO",
@@ -890,6 +893,6 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH, log=True)
 day_1 = ac.ephemeris_data[8]
 all_planet_info = ac.organize_all_planets_info_for_day(day_1, log=False)
 
-ac.get_all_natal_aspects_for_day(all_planet_info, orb=2, log=True)
+ac.organize_day_ephemeris(day_1, log=True)
 
 
