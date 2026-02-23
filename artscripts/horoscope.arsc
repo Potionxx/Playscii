@@ -1,5 +1,5 @@
 # Artscript file to be run by Playscii
-print("\n\n\nRunning horoscope.arsc")
+print("\n\n\n\n\nRunning horoscope.arsc")
 # Library imports
 
 # Local imports
@@ -167,7 +167,7 @@ class AstrologyCalculator:
     }
 
 
-    def __init__(self, natal_planets, natal_houses, year_month, timezone="central"):
+        print("\nInitializing AstrologyCalculator class.")
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
         self.year_month = year_month
@@ -178,6 +178,25 @@ class AstrologyCalculator:
         self.import_ephemeris()
         self.timezone = timezone
         self.check_timezone()
+        print("Finished initializing AstrologyCalculator class.\n\n\n")
+
+    
+    def log(self, log, message, data=None):
+        if log == False:
+            return
+        
+        print(message)
+        if data == None:
+            return
+        
+        import pprint
+
+        if type(data) == dict:
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(data)
+        elif type(data) == list:
+            for item in data:
+                print(f"\t{item}")
 
 
     def check_timezone(self):  
