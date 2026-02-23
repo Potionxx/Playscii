@@ -455,6 +455,50 @@ class AstrologyCalculator:
                 return(aspect_name)
     
 
+    def get_all_transit_only_aspects_for_day(self, all_planet_info_for_day, orb=0, log=False):
+        """This method returns a list aspect_info dictionaries for all the aspects between the transiting planets for a given day."""
+        method_name = "get_all_transit_only_aspects_for_day"
+        aspect_list = []
+        self.log(log, f"\nLogging {method_name}:\n")
+        for planet1 in range(1, 12):
+            planet1_name = self.PLANET_DICT[planet1]
+            planet1_info = all_planet_info_for_day[planet1_name]
+            ephemery_string1 = planet1_info["ephemery_string"]
+
+            for planet2 in range(planet1 + 1, 13):
+                planet2_name = self.PLANET_DICT[planet2]
+                planet2_info = all_planet_info_for_day[planet2_name]
+                ephemery_string2 = planet2_info["ephemery_string"]
+
+
+                aspect_name = self.check_aspects_for_2_planets(
+                        ephemery_string1, 
+                        ephemery_string2, 
+                        orb, 
+                        log)
+                
+                if aspect_name == None:
+                    self.log(log, f"No aspect found between Transit {planet1_info['degree']} degree {planet1_name} and Transit {planet2_info['degree']} degree {planet2_name}. Moving on to the next planet pair.\n")
+                    continue
+
+                aspect_info = self.organize_aspect_info(
+                    planet1_info,
+                    planet2_info,
+                    aspect_name,
+                )
+
+                aspect_list.append(aspect_info)
+
+                self.log(log, f"{aspect_name} aspect found between Transit {planet1_info['ephemery_string']} {planet1_name} and Transit {planet2_info['ephemery_string']} {planet2_name}.\n")
+
+        self.log(log, f"\nFinished logging {method_name}. There are {len(aspect_list)} transit-only aspects.")
+        return aspect_list
+                
+                
+
+        
+
+
     def get_all_natal_aspects_for_day(self, all_planet_info_for_day, orb=0, log=False):
         """This method returns a list aspect_info dictionaries for all the aspects between the transiting planets and the natal planets for a given day.
          
@@ -500,7 +544,6 @@ class AstrologyCalculator:
     def check_aspects_for_2_planets(self, ephemery_string1, ephemery_string2, orb=0, log=False):
         """This method checks the aspects between two planets and returns the aspect name if there is one."""
         self.log(log, "\nLogging check_aspects_for_2_planets:")
-        self.log(log, f"\tPlanet 1: {ephemery_string1}")
 
         aspect_name = self.check_aspect(ephemery_string1, ephemery_string2, orb=orb)
         if aspect_name == None:
@@ -825,11 +868,12 @@ class AstrologyCalculator:
 
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
-                log=False)
+                log)
           
         equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
         transits_aspecting_natal = self.get_all_natal_aspects_for_day(all_planet_info_for_day, self.orb, log)
-
+        transits_aspecting_eachother = self.get_all_transit_only_aspects_for_day(all_planet_info_for_day, self.orb, log)
+        
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
             "date_at_local_time": date_in_time_zone,
@@ -839,7 +883,7 @@ class AstrologyCalculator:
             "season_name": season_name,
             "equinox_or_solstice": equinox_or_solstice,
             "all_planet_positions": all_planet_info_for_day,
-            "transits_aspecting_each_other": "TODO",
+            "transits_aspecting_each_other": transits_aspecting_eachother,
             "transits_aspecting_natal": transits_aspecting_natal,
             "moon_phase_index": "TODO",
             "moon_phase_first_word": "TODO",
@@ -855,6 +899,11 @@ class AstrologyCalculator:
                         print(f"\t\t{planet}:")
                         for info_key, info_value in planet_info.items():
                             print(f"\t\t\t{info_key}: {info_value}")
+                elif key == "transits_aspecting_each_other" or key == "transits_aspecting_natal":
+                    print("====================================================")
+                    print(f"\n{key}:\n")
+                    for aspect_info in value:
+                        self.log_aspect_info(aspect_info)
                 else:
                     print(f"\t{key}: {value}")
             print("Finished organizing day ephemeris\n")
@@ -892,7 +941,7 @@ ac = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH, log=True)
 
 day_1 = ac.ephemeris_data[8]
 all_planet_info = ac.organize_all_planets_info_for_day(day_1, log=False)
-
+ac.orb = 1
 ac.organize_day_ephemeris(day_1, log=True)
 
 
