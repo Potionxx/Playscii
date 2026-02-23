@@ -289,7 +289,13 @@ class AstrologyCalculator:
     
     def get_full_degree(self, ephemery_string): 
         """Returns a < 360 degree position."""
-        zo = ephemery_string[2:4]
+        if type(ephemery_string) != int and type(ephemery_string) != str:
+            print("get_full_degree function received an ephemery_string that is not a string or int. Returning None.")
+            return None
+        if type(ephemery_string) == str:
+            zo = ephemery_string[2:4]
+        elif type(ephemery_string) == int:
+            zo = ephemery_string
         return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
 
 
