@@ -519,10 +519,6 @@ class AstrologyCalculator:
         self.log(log, f"\nFinished logging {method_name}. There are {len(aspect_list)} transit-only aspects.")
         return aspect_list
                 
-                
-
-        
-
 
     def get_all_natal_aspects_for_day(self, all_planet_info_for_day, orb=0, log=False):
         """This method returns a list aspect_info dictionaries for all the aspects between the transiting planets and the natal planets for a given day.
@@ -949,6 +945,20 @@ ASTROLOGY_OBJECT.organize_day_ephemeris(single_row_from_csv, log=CALCULATOR_LOG)
 
 
 class DrawAstrology():
+    TILE_INDEX = {
+        "sun": 154,
+        "moon": 155,
+        "mercury": 156,
+        "venus": 157,
+        "mars": 158,
+        "jupiter": 159,
+        "saturn": 174,
+        "uranus": 175,
+        "neptune": 176,
+        "pluto": 177,
+        "north_node": 178,
+        "chiron": 179,
+    }
     def __init__(
             self, 
             art_obj, 
@@ -1056,7 +1066,7 @@ class DrawAstrology():
         date_string = f'{month_abrev} {current_date}'
         print("\n\n")
         self.quick_write(x, y, date_string)
-        self.quick_tile(x+7, y, day_ruling_planet)
+        self.quick_tile(x+7, y, self.TILE_INDEX[day_ruling_planet])
         self.quick_write(x, y+1, weekday_name)
         self.quick_write(x, y+2, "00:00 UT")
         self.quick_write(x+12, y, "Data from")
