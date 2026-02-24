@@ -946,6 +946,18 @@ ASTROLOGY_OBJECT.organize_day_ephemeris(single_row_from_csv, log=CALCULATOR_LOG)
 
 class DrawAstrology():
     TILE_INDEX = {
+        "aries":114,
+        "taurus":115,
+        "gemini":116,
+        "cancer":117,
+        "leo":118,
+        "virgo":119,
+        "libra":134,
+        "scorpio":135,
+        "sagittarius":136,
+        "capricorn":137,
+        "aquarius":138,
+        "pisces":139,
         "sun": 154,
         "moon": 155,
         "mercury": 156,
@@ -962,6 +974,20 @@ class DrawAstrology():
         'tile_edge_corner': 233,
         'tile_edge_side': 232,
         'solid': 187,
+        "roman_1":188,
+        "roman_2":189,
+        "roman_3":190,
+        "roman_4":191,
+        "roman_5":192,
+        "roman_6":193,
+        "roman_7":194,
+        "roman_8":195,
+        "roman_9":196,
+        "roman_10":197,
+        "roman_11":198,
+        "roman_12":199,
+        "isosceles":225,
+        "1circle":265,
     }
     def __init__(
             self, 
@@ -1004,12 +1030,12 @@ class DrawAstrology():
         self.art_obj.write_string(self.frame, self.info_layer, x, y, string, self.color)
 
 
-    def quick_border(self, x, y, width, height):
+    def quick_border(self, frame, layer, x, y, width, height):
         """This accesses the art object's border method.
         
         Everything is the same color, so saves typing one argument
         """
-        self.ex.border(x, y, width, height, self.color)
+        self.border(frame, layer, x, y, width, height, self.color)
         #self.ex.block_border(x, y, width, height, self.color, self.bg_color)
 
 
@@ -1154,7 +1180,7 @@ class DrawAstrology():
         self.write_sideways(frame, layer, 23, 7, "NEW CHANGES", self.color)
 
 
-    def draw_ephemery_info(self, frame, layer):
+    def draw_ephemery_info(self, frame, layer, all_planet_positions):
         """Draws the ephemeris information for the day.
         
         Occupies a 18x14 space. The first 9x14 space lists the planets
@@ -1165,33 +1191,45 @@ class DrawAstrology():
         If self.include_natal_info is True, it also lists the house of each planet.
         """
         x, y = self.ephemery_coords[0], self.ephemery_coords[1]
-        current_date = self.frame+1
-        #self.quick_write(x+1, y-1, "Ephem")
+
         self.block_border(frame, layer, x, y, 14, 14, self.color, self.bg_color) # ephemery border
-        self.block_border(x+15, y, 5, 14, self.color, self.bg_color) # ephemery details border
+        self.block_border(frame, layer, x+15, y, 5, 14, self.color, self.bg_color) # ephemery details border
 
-        for count, ephem_dict in enumerate(self.astro_user.ephemeris_list[current_date]):
-            self.quick_write(x+2, y+1+count, str(ephem_dict["degree"])) # degree
-            self.quick_tile(x+5, y+1+count, ephem_dict["planet"]) # todays planet
-            self.quick_tile(x+6, y+1+count, ephem_dict["zodiac"]) # sign	
-            if self.include_natal_info:
-                self.quick_tile(x+7, y+1+count, str(ephem_dict["house"])) # house
-            self.quick_write(x+8, y+1+count, str(ephem_dict["station"])) # retrograde status
+        ephemery_y_cursor = 1
+        for planet in all_planet_positions.values():
+            degree = planet["degree"]
+            planet_name = planet["planet"]
+            planet_tile = self.TILE_INDEX[planet_name]
+            sign_name = planet["sign"]
+            sign = self.TILE_INDEX[sign_name]
+            house_number = planet["house"]
+            house = self.TILE_INDEX[f"roman_{house_number}"] # The tile
+            retrograde = planet["retrograde"]
+            dignity = planet["dignity"]
 
-            self.quick_write(x+16, y+1+count, ephem_dict["zodiac_changed"]) # if sign changed since yesterday
+            self.quick_write(x+2, y+ephemery_y_cursor, str(degree)) # degree
+            self.quick_tile(x+5, y+ephemery_y_cursor, planet_tile) # todays planet
+            self.quick_tile(x+6, y+ephemery_y_cursor, sign) # sign	
             if self.include_natal_info:
-                self.quick_write(x+17, y+1+count, ephem_dict["house_changed"]) # if house changed since yesterday
-            self.quick_write(x+18, y+1+count, ephem_dict["station_changed"]) # if retrograde station changed since yesterday
-            self.quick_write(x+10, y+1+count, ephem_dict["dignity"]) # writes the planets dignity status or a " "  
+                self.quick_tile(x+7, y+ephemery_y_cursor, str(house)) # house
+            self.quick_write(x+8, y+ephemery_y_cursor, retrograde) # retrograde status
+            """
+            self.quick_write(x+16, y+ephemery_y_cursor, ephem_dict["zodiac_changed"]) # if sign changed since yesterday
+            if self.include_natal_info:
+                self.quick_write(x+17, y+ephemery_y_cursor, ephem_dict["house_changed"]) # if house changed since yesterday
+            self.quick_write(x+18, y+ephemery_y_cursor, ephem_dict["station_changed"]) # if retrograde station changed since yesterday
+            """
+            self.quick_write(x+10, y+ephemery_y_cursor, dignity) # writes the planets dignity status or a " "  
+            ephemery_y_cursor += 1
 
 
     def draw_sun(self, x, y):
         """Draws a 3x3 sun picutre."""
-        self.quick_tile(x+1, y, self.char_names['isosceles'], 0, self.color, 2)
-        self.quick_tile(x, y+1, self.char_names['isosceles'], 0, self.color, 1)
-        self.quick_tile(x+2, y+1, self.char_names['isosceles'], 0, self.color, 3)
-        self.quick_tile(x+1, y+2, self.char_names['isosceles'], 0, self.color, 0)
-        self.quick_tile(x+1, y+1, self.char_names["1circle"], 0, self.color, 0)
+        self.quick_tile(x+1, y, self.TILE_INDEX['isosceles'], 0, self.color, 2)
+        self.quick_tile(x, y+1, self.TILE_INDEX['isosceles'], 0, self.color, 1)
+        self.quick_tile(x+2, y+1, self.TILE_INDEX['isosceles'], 0, self.color, 3)
+        self.quick_tile(x+1, y+2, self.TILE_INDEX['isosceles'], 0, self.color, 0)
+        self.quick_tile(x+1, y+1, self.TILE_INDEX["1circle"], 0, self.color, 0)
 
 
     def draw_moon(self, x, y, phase):
@@ -1201,74 +1239,70 @@ class DrawAstrology():
         0 is a new moon, 7 is a full moon.
         """
         #always rounds out top
-        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y, self.char_names["3circle_solid_1"], 0, self.bg_color, 0)
-        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y+2, self.char_names["3circle_solid_1"], 0, self.bg_color, 2)
+        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 0)
+        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y+2, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 2)
         if phase == 0:	
-            self.quick_tile(x, y, self.char_names["3circle_line_0"])
-            self.quick_tile(x, y+1, self.char_names["3circle_line_1"], transform=3)
-            self.quick_tile(x, y+2, self.char_names["3circle_line_0"], transform=3)
-            self.quick_tile(x+1, y, self.char_names["3circle_line_1"])
-            self.quick_tile(x+1, y+2, self.char_names["3circle_line_1"], transform=2)			
-            self.quick_tile(x+2, y, self.char_names["3circle_line_0"], transform=1)
-            self.quick_tile(x+2, y+2, self.char_names["3circle_line_0"], transform=2)	
-            self.quick_tile(x+2, y+1, self.char_names["3circle_line_1"], transform=1)
+            self.quick_tile(x, y, self.TILE_INDEX["3circle_line_0"])
+            self.quick_tile(x, y+1, self.TILE_INDEX["3circle_line_1"], transform=3)
+            self.quick_tile(x, y+2, self.TILE_INDEX["3circle_line_0"], transform=3)
+            self.quick_tile(x+1, y, self.TILE_INDEX["3circle_line_1"])
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["3circle_line_1"], transform=2)			
+            self.quick_tile(x+2, y, self.TILE_INDEX["3circle_line_0"], transform=1)
+            self.quick_tile(x+2, y+2, self.TILE_INDEX["3circle_line_0"], transform=2)	
+            self.quick_tile(x+2, y+1, self.TILE_INDEX["3circle_line_1"], transform=1)
         #left column
         if phase > 3:
-            self.quick_tile(x, y, self.char_names["3circle_solid_0"])
-            self.quick_tile(x, y+1, self.char_names["3circle_solid_1"], transform=3)
-            self.quick_tile(x, y+2, self.char_names["3circle_solid_0"], transform=3)
+            self.quick_tile(x, y, self.TILE_INDEX["3circle_solid_0"])
+            self.quick_tile(x, y+1, self.TILE_INDEX["3circle_solid_1"], transform=3)
+            self.quick_tile(x, y+2, self.TILE_INDEX["3circle_solid_0"], transform=3)
         if phase == 3: #rounds out the gibbous shape
-            self.quick_tile(x, y, self.char_names["2ramp_1"], 0, self.color, 7)
-            self.quick_tile(x, y+1, self.char_names["half"], transform=2)
-            self.quick_tile(x, y+2, self.char_names["2ramp_1"], 0, self.color, 1)
+            self.quick_tile(x, y, self.TILE_INDEX["2ramp_1"], 0, self.color, 7)
+            self.quick_tile(x, y+1, self.TILE_INDEX["half"], transform=2)
+            self.quick_tile(x, y+2, self.TILE_INDEX["2ramp_1"], 0, self.color, 1)
         #center column
         if phase == 1:
-            self.quick_tile(x+1, y, self.char_names["3circle_solid_0"], 0, self.bg_color, 1)
-            self.quick_tile(x+1, y+1, self.char_names["3circle_solid_1"], 0, self.bg_color, 1)
-            self.quick_tile(x+1, y+2, self.char_names["3circle_solid_0"], 0, self.bg_color, 2)
+            self.quick_tile(x+1, y, self.TILE_INDEX["3circle_solid_0"], 0, self.bg_color, 1)
+            self.quick_tile(x+1, y+1, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 1)
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["3circle_solid_0"], 0, self.bg_color, 2)
         if phase == 7:
-            self.quick_tile(x+1, y, self.char_names["3circle_solid_0"], 0, self.bg_color)
-            self.quick_tile(x+1, y+1, self.char_names["3circle_solid_1"], 0, self.bg_color, 3)
-            self.quick_tile(x+1, y+2, self.char_names["3circle_solid_0"], 0, self.bg_color, 3)
+            self.quick_tile(x+1, y, self.TILE_INDEX["3circle_solid_0"], 0, self.bg_color)
+            self.quick_tile(x+1, y+1, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 3)
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["3circle_solid_0"], 0, self.bg_color, 3)
         if phase == 2:
-            self.quick_tile(x+1, y, self.char_names["half"],self.color, 0, 2)
-            self.quick_tile(x+1, y+1, self.char_names["half"],self.color, 0, 2)
-            self.quick_tile(x+1, y+2, self.char_names["half"],self.color, 0, 2)
+            self.quick_tile(x+1, y, self.TILE_INDEX["half"],self.color, 0, 2)
+            self.quick_tile(x+1, y+1, self.TILE_INDEX["half"],self.color, 0, 2)
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["half"],self.color, 0, 2)
         if phase == 6:
-            self.quick_tile(x+1, y, self.char_names["half"])
-            self.quick_tile(x+1, y+1, self.char_names["half"])
-            self.quick_tile(x+1, y+2, self.char_names["half"])
+            self.quick_tile(x+1, y, self.TILE_INDEX["half"])
+            self.quick_tile(x+1, y+1, self.TILE_INDEX["half"])
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["half"])
         if 6 > phase > 2:
-            self.quick_tile(x+1, y, self.char_names["3circle_solid_1"])
-            self.quick_tile(x+1, y+1, self.char_names["solid"])
-            self.quick_tile(x+1, y+2, self.char_names["3circle_solid_1"], transform=2)
+            self.quick_tile(x+1, y, self.TILE_INDEX["3circle_solid_1"])
+            self.quick_tile(x+1, y+1, self.TILE_INDEX["solid"])
+            self.quick_tile(x+1, y+2, self.TILE_INDEX["3circle_solid_1"], transform=2)
         #column 3
         if phase == 5: #rounds out the gibbous shape
-            self.quick_tile(x+2, y, self.char_names["2ramp_1"], 0, self.color, 3)
-            self.quick_tile(x+2, y+1, self.char_names["half"], self.color, None, 0)
-            self.quick_tile(x+2, y+2, self.char_names["2ramp_1"], 0, self.color, 6)
+            self.quick_tile(x+2, y, self.TILE_INDEX["2ramp_1"], 0, self.color, 3)
+            self.quick_tile(x+2, y+1, self.TILE_INDEX["half"], self.color, None, 0)
+            self.quick_tile(x+2, y+2, self.TILE_INDEX["2ramp_1"], 0, self.color, 6)
         if 5 > phase > 0:
-            self.quick_tile(x+2, y, self.char_names["3circle_solid_0"], transform=1)
-            self.quick_tile(x+2, y+1, self.char_names["3circle_solid_1"], transform=1)
-            self.quick_tile(x+2, y+2, self.char_names["3circle_solid_0"], transform=2)
+            self.quick_tile(x+2, y, self.TILE_INDEX["3circle_solid_0"], transform=1)
+            self.quick_tile(x+2, y+1, self.TILE_INDEX["3circle_solid_1"], transform=1)
+            self.quick_tile(x+2, y+2, self.TILE_INDEX["3circle_solid_0"], transform=2)
 
 
-    def draw_sun_data(self):
+    def draw_sun_data(self, frame, layer, zodiac_name, sun_degree):
         """Draws the sun data for the day.
         
         Occupies an 9x8 space. Within its border, it lists the zodiac season,
         the sun's degree, and an image of the sun.
         """
         x, y = self.sun_data_coords[0], self.sun_data_coords[1]
-        current_date = self.frame+1
-        self.ex.block_border(x, y, 10, 8, self.color, self.bg_color) #sun border
-        self.draw_sun(x+2, y+1)
-        season_name = self.astro_user.sun_info[current_date][0]
-        sun_degree = self.astro_user.sun_info[current_date][1]
-        
+        self.block_border(frame, layer, x, y, 10, 8, self.color, self.bg_color) #sun border
+        self.draw_sun(x+2, y+1)        
         self.quick_border(x+5, y+1, 4, 3) #sun degree border
-        self.quick_write(x+2, y+5, season_name.capitalize())
-        self.quick_write(x+2, y+6, "Season")
+        self.quick_write(x+2, y+5, zodiac_name.capitalize())
+        self.quick_write(x+2, y+6, "Zodiac")
         self.quick_write(x+6, y+2, sun_degree)
 
 
@@ -1374,8 +1408,13 @@ class DrawAstrology():
         day_ruling_planet = organized_day_data["day_ruling_planet"]
         weekday_name = organized_day_data["weekday_name"]
         self.draw_header(frame, layer, month_name, day_ruling_planet, weekday_name)
-        self.draw_ephemery_info(frame, layer)
-        self.draw_sun_data()
+
+        all_planet_positions = organized_day_data["all_planet_positions"]
+        self.draw_ephemery_info(frame, layer, all_planet_positions)
+
+        sun_sign = all_planet_positions["sun"]["sign"]
+        sun_degree = all_planet_positions["sun"]["degree"]
+        self.draw_sun_data(frame, layer, sun_sign, sun_degree)
         self.draw_moon_data()
         self.draw_transit_data()
         self.add_frame_check(self.art_obj)
