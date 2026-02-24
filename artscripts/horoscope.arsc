@@ -1020,6 +1020,24 @@ class DrawAstrology():
         self.art_obj.set_tile_at(self.frame, self.info_layer, x, y, tile, fg_color, bg_color, transform)
 
 
+    def write_sideways(self, frame, layer, x, y, string, fg_color, bg_color=None):
+        """This method writes a string vertically instead of horizontally.
+        
+        The letters are written top to bottom, and the letters don't have any rotation."""
+        for count, letter in enumerate(string):
+            if y+count > self.art_obj.height-1:
+                print(f"Error: trying to write outside the bounds of the art object. Stopping writing string '{string}' at letter '{letter}'")
+                break
+
+            self.art_obj.write_string(
+                    frame, 
+                    layer, 
+                    x, 
+                    y+count, 
+                    letter, 
+                    fg_color, 
+                    bg_color)
+
     def draw_change_in(self, x, y):
         self.quick_write(x, y, "Change In:")
         
@@ -1051,6 +1069,8 @@ class DrawAstrology():
         
     def draw_header(
             self,
+            frame,
+            layer,
             month_name,
             day_ruling_planet,
             weekday_name):
@@ -1072,7 +1092,7 @@ class DrawAstrology():
         self.quick_write(x+12, y, "Data from")
         self.quick_write(x+12, y+1, "Astrowin")
         #self.draw_change_in(x+10, y)
-        self.ex.write_sideways(23, 7, "NEW CHANGES", self.color)
+        self.write_sideways(frame, layer, 23, 7, "NEW CHANGES", self.color)
 
 
     def draw_ephemery_info(self):
@@ -1289,12 +1309,12 @@ class DrawAstrology():
             art_obj.add_frame_to_end()
 
 
-    def draw_day(self, current_date, organized_day_data):
+    def draw_day(self, frame, layer, current_date, organized_day_data):
         """Draws the data for a single day."""
         month_name = organized_day_data["month_name"]
         day_ruling_planet = organized_day_data["day_ruling_planet"]
         weekday_name = organized_day_data["weekday_name"]
-        self.draw_header(month_name, day_ruling_planet, weekday_name)
+        self.draw_header(frame, layer, month_name, day_ruling_planet, weekday_name)
         self.draw_ephemery_info()
         self.draw_sun_data()
         self.draw_moon_data()
@@ -1348,4 +1368,4 @@ da = DrawAstrology(
 
 da.reset(CANVAS_WIDTH, CANVAS_HEIGHT, LAYER_LIST)
 organized_day_data = ASTROLOGY_OBJECT.organize_day_ephemeris(single_row_from_csv, log=CALCULATOR_LOG)
-da.draw_day(1, organized_day_data)
+da.draw_day(0, 1, 1, organized_day_data)
