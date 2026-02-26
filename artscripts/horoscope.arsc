@@ -386,10 +386,14 @@ class AstrologyCalculator:
                 f"House info: ",
                 house_info)
             # Decide what the next house is.
-            if house_number < 12: # If house_number is NOT the last house... 
-                next_house_info = self.natal_houses[house_index+1] # use the next highest index
-            elif house_number == 12: # If house_number IS the last house... 
-                next_house_info = self.natal_houses[0] # set next_house_info to the first house.
+            # If house_number is NOT the last house... 
+            if house_number < 12: 
+                # Use the next highest index
+                next_house_info = self.natal_houses[house_index+1] 
+            # If house_number IS the last house... 
+            elif house_number == 12: 
+                # Set next_house_info to the first house.
+                next_house_info = self.natal_houses[0] 
 
             # Calculate the starting and ending degrees of the house
             starting_degree = self.get_full_degree(house_info)
@@ -401,10 +405,11 @@ class AstrologyCalculator:
                 "ending_degree": ending_degree,
             }
 
-            # Then, save that small dictionary to a larger dictionary of all the houses, with house_number as the key.
+            # Then, save that small dictionary to a larger 
+            # dictionary of all the houses, 
+            # with house_number as the key.
             self.organized_natal_house_info[house_number] = house_info
 
-        # If log was set to True, print the organized house info to the console for testing purposes.
         if log == True:
             print("\nPrinting organized natal house info:")
             for house in self.organized_natal_house_info:
@@ -428,25 +433,42 @@ class AstrologyCalculator:
         self.log(log, f"\t{starting_degree}---------{ending_degree}")
 
 
-        # If the house wraps around 0 degrees, then add 360 to the degree and ending degree to make the math work.
+        # If the house wraps around 0 degrees, 
+        # then add 360 to the degree and ending degree 
+        # to make the math work.
         if starting_degree > ending_degree:
-            if degree < 180: # Only adjust the degree if it's in the first half of the zodiac, otherwise it will be correct as is.
+            # Only adjust the degree if it's in 
+            # the first half of the zodiac, 
+            # otherwise it will be correct as is.
+            if degree < 180:
                 degree += 360
             ending_degree += 360
 
-            self.log(log, f"\tHouse wraps around 0 degrees, adjusting degree and ending degree for testing:", log)
-            self.log(log, f"\tAdjusted Testing Degree: {degree}", log)
-            self.log(log, f"\tAdjusted Ending Degree: {ending_degree}", log)
+            log_message = (
+                f"\tHouse wraps around 0 degrees, "
+                "adjusting degree and ending degree for testing:"
+            )
+            self.log(log, log_message, log)
+
+            log_message = f"\tAdjusted Testing Degree: {degree}"
+            self.log(log, log_message, log)
+
+            log_message = f"\tAdjusted Ending Degree: {ending_degree}"
+            self.log(log, log_message, log)
         
         # Now do the test to see if the degree is in the house.
-        
-        self.log(log, f"\tTesting if {degree} in range({starting_degree}, {ending_degree})")
+        log_message = (
+             f"\tTesting if {degree} in range({starting_degree}, "
+             f"{ending_degree})"
+        )
+        self.log(log, log_message)
+
         if degree in range(starting_degree, ending_degree):
-            self.log(log, f"\tDegree {degree} is in this house. Returning True.")
+            self.log(log, f"\tDegree {degree} is in this house.")
             self.log(log, "Finished Log for degree_is_in_house\n")
             return True
         else:
-            self.log(log, f"\tDegree {degree} is NOT in this house. Returning False.")
+            self.log(log, f"\tDegree {degree} is NOT in this house.")
             self.log(log, "Finished Log for degree_is_in_house\n")
             return False
         
