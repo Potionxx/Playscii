@@ -549,11 +549,10 @@ class AstrologyCalculator:
                 planet2_info = all_planet_info_for_day[planet2_name]
                 ephemery_string2 = planet2_info["ephemery_string"]
 
-                aspect_name = self.check_aspect_for_2_planets(
+                aspect_name = self.check_aspect_name(
                         ephemery_string1, 
                         ephemery_string2, 
-                        orb, 
-                        log)
+                        orb)
                 
                 # Looks like theres no aspect...
                 if aspect_name == None:
@@ -654,15 +653,6 @@ class AstrologyCalculator:
         return aspect_info_list
     
 
-    def check_aspect_for_2_planets(
-            self, ephemery_string1, ephemery_string2, orb=0, log=False):
-        """This method checks the aspect between two planets and returns the aspect name if there is one."""
-        aspect_name = self.check_aspect_name(ephemery_string1, ephemery_string2, orb=orb)
-        if aspect_name == None:
-            return None
-        return aspect_name
-    
-
     def check_aspects_between_1_transit_and_all_natal(self, transit_planet_info,  orb=0, log=False):
         """This method checks the aspects between one natal planet and all the daily transiting planets, and returns a list of aspect info dictionaries."""
         aspect_info = []
@@ -675,12 +665,18 @@ class AstrologyCalculator:
 
         for natal_planet_name, natal_ephemery_string in self.natal_planets.items():
             # If there's no aspect, move on to the next planet.
-            if self.check_aspect_for_2_planets(transit_planet_ephemery_string, natal_ephemery_string, orb=orb) == None:    
-                self.log(log, f"\tNo aspect found with natal {natal_ephemery_string} {natal_planet_name}.")
+            if self.check_aspect_name(
+                    transit_planet_ephemery_string, 
+                    natal_ephemery_string, orb=orb) == None:  
+                log_message = (
+                    f"\tNo aspect found with natal : "
+                    f"{natal_ephemery_string} {natal_planet_name}."
+                )  
+                self.log(log, log_message)
                 continue
             
             # If there is an aspect, organize the aspect info into a dictionary and add it to the list of aspect info dictionaries.
-            aspect_name = self.check_aspect_for_2_planets(transit_planet_ephemery_string, natal_ephemery_string, orb=orb)
+            aspect_name = self.check_aspect_name(transit_planet_ephemery_string, natal_ephemery_string, orb=orb)
             natal_planet_info = self.organize_planet_ephemeris(
                     natal_planet_name, natal_ephemery_string, log=log)
 
