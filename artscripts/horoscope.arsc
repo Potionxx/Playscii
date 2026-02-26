@@ -615,7 +615,7 @@ class AstrologyCalculator:
             # If there is an aspect, organize the aspect info into a dictionary and add it to the list of aspect info dictionaries.
             aspect_name = self.check_aspects_for_2_planets(transit_planet_ephemery_string, natal_ephemery_string, orb=orb)
             natal_planet_info = self.organize_planet_ephemeris(
-                    natal_planet_name, natal_ephemery_string, log)
+                    natal_planet_name, natal_ephemery_string, log=log)
 
             self.log(log, f"{aspect_name} found between transit {transit_planet_name} and natal {natal_planet_name}: {aspect_name}.")
 
