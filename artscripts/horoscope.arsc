@@ -635,14 +635,14 @@ class AstrologyCalculator:
                     f"\tNo aspect info found for transiting planet "
                     f"{transit_planet_name}. Moving on to the next planet.\n"
                 )
-                self.log(log, )
+                self.log(log, log_message)
                 # gemmie out
                 continue
             
             # If there is an aspect, save the info dictionary into a list.
             aspect_info_list.extend(aspect_info)
             
-        log_message (
+        log_message = (
             f"\nFinished logging {method_name}. "
             "There are {len(aspect_info_list)} aspects."
         )
@@ -660,13 +660,6 @@ class AstrologyCalculator:
         aspect_name = self.check_aspect_name(ephemery_string1, ephemery_string2, orb=orb)
         if aspect_name == None:
             return None
-
-        self.log(log, f"\tAspect found between:")
-        self.log(log, f"\t\tPlanet 1: {ephemery_string1}")
-        self.log(log, f"\t\tPlanet 2: {ephemery_string2}")
-        self.log(log, f"\t\tAspect found: {aspect_name}")
-        self.log(log, "Finished logging check_aspects_for_2_planets\n")
-
         return aspect_name
     
 
