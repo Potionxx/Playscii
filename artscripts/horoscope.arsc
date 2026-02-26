@@ -216,17 +216,19 @@ class AstrologyCalculator:
             return
         
         print(message)
+
         if data == None:
             return
-        
-        import pprint
 
         if type(data) == dict:
+            import pprint
             pp = pprint.PrettyPrinter(indent=4)
             pp.pprint(data)
         elif type(data) == list:
             for item in data:
                 print(f"\t{item}")
+        elif type(data) == str:
+            print(data)
 
 
     def check_timezone(self):  
