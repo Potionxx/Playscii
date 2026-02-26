@@ -32,7 +32,7 @@ INCLUDE_NATAL_INFO = True
 IMPORTANT_GLYPH = 50
 TIMEZONE = "CT"
 ORB = 0
-CALCULATOR_LOG = False
+CALCULATOR_LOG = True
 
 
 """
@@ -323,7 +323,7 @@ class AstrologyCalculator:
     def get_sign(self, ephemery_string):
         """Returns the full name of a zodiac sign.
         
-        If the ephemery string is "15AR23", this method will return "Aries".
+        If the ephemery string is "15AR23", it returns "Aries".
         """
         abrev = abrev = ephemery_string[2:4]
         full_sign_name = self.ZODIAC_ABRIVIATIONS[abrev]
@@ -359,22 +359,28 @@ class AstrologyCalculator:
 
 
     def organize_natal_house_info(self, log=False):
-        """This method saves a dictionary with the starting and ending degree of each house.
+        """Saves a dictionary that makes get_house() easier. 
+        
+        Dict contains thestarting and ending degree of each house.
 
-        To find the ending degree of a house, it looks at the starting degree of the next house.
-        For the 12th house, the next house is the 1st house.
-        This method also has an optional parameter called log, which if set to True,
-        will print the organized house info to the console for testing purposes.
+        To find the ending degree of a house, 
+        it looks at the starting degree of the next house.
+        But for the 12th house, it looks at the 1st house.
         """
-        # Initialize variables and an empty dictionary to hold the organized house info.
+        # Initialize variables
         house_number = 1
         self.organized_natal_house_info = {}
 
         # Now, get info for each house
         for house_index in range(12):
-            house_number = house_index+1 # Index (house_index) starts at 0 but house number starts at 1.
-            house_info = self.natal_houses[house_index]
+            # Prevents off by 1 errors. (Index = 0, but House = 1)
+            house_number = house_index+1 
 
+            house_info = self.natal_houses[house_index]
+            self.log(
+                log, 
+                f"House info: ",
+                house_info)
             # Decide what the next house is.
             if house_number < 12: # If house_number is NOT the last house... 
                 next_house_info = self.natal_houses[house_index+1] # use the next highest index
