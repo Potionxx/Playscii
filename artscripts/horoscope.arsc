@@ -304,34 +304,28 @@ class AstrologyCalculator:
             line_count = 0
             for row in csv_reader:
                 if line_count == 0:
-                    self.log(log, f'Column names are {", ".join(row)}')
+                    # Skip the header row.
                     line_count += 1
-                else:
-                    self.ephemeris_data.append(row)
-                    self.log(log, f'\t{row}')
-                    line_count += 1
-
-        self.log(log, f'Imported ephemeris data from {csvfilename}, total lines: {line_count}')
+                    continue
+            
+                self.ephemeris_data.append(row)
+                self.log(log, f'\t{row}')
+                line_count += 1
+        log_message = (
+                    "Finished importing ephemeris data from "
+                    f"{csvfilename}. "
+                    f"Total lines: {line_count}")
+        self.log(
+            log, 
+            log_message)
         
-
-
-    def get_sign_abreve(self, ephemery_string): 
-        """Returns a 2 char zodiac string from one of the csv file's ephemery strings.
-        
-        If the ephemery string is "15AR23", this method will return "AR". 
-        The first two characters are the degree, the next two characters are the zodiac sign abreviation, 
-        and the last two characters are not used by this program.
-        """
-        abrev = ephemery_string[2:4]
-        return(abrev)
-    
 
     def get_sign(self, ephemery_string):
         """Returns the full name of a zodiac sign.
         
         If the ephemery string is "15AR23", this method will return "Aries".
         """
-        abrev = self.get_sign_abreve(ephemery_string)
+        abrev = abrev = ephemery_string[2:4]
         full_sign_name = self.ZODIAC_ABRIVIATIONS[abrev]
         return(full_sign_name)  
     
@@ -676,10 +670,9 @@ class AstrologyCalculator:
     
     
     def test_getters(self, ephemery_string):
-        """This method is for testing the get_sign_abreve, get_sign, and get_degree methods.
+        """This method is for testing the get_sign, and get_degree methods.
         """
         print(f"Testing getters with ephemery string: {ephemery_string}")
-        print(f"Sign abreviation: {self.get_sign_abreve(ephemery_string)}")
         print(f"Sign full name: {self.get_sign(ephemery_string)}")
         print(f"Degree: {self.get_degree(ephemery_string)}")
         print(f"Full degree: {self.get_full_degree(ephemery_string)}")
