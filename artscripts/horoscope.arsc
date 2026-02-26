@@ -732,17 +732,14 @@ class AstrologyCalculator:
             "planet": planet,
             "ephemery_string": ephemery_string
         }
-        if yesterday_planet_info == False:
-            yesterday_planet_info = None
 
-        if yesterday_planet_info == None:
+        if yesterday_planet_info is None:
             planet_info["zodiac_changed"] = " "
             self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['zodiac_changed']}'")
             planet_info["house_changed"] = " "
             self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['house_changed']}'")
             planet_info["retrograde_changed"] = " "
             self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['retrograde_changed']}'")
-
         else:
             previous_sign = yesterday_planet_info["sign"]
             current_sign = planet_info["sign"]
