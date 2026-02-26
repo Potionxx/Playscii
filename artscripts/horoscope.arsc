@@ -32,7 +32,7 @@ INCLUDE_NATAL_INFO = True
 IMPORTANT_GLYPH = 50
 TIMEZONE = "CT"
 ORB = 0
-CALCULATOR_LOG = True
+CALCULATOR_LOG = False
 
 
 """
@@ -356,8 +356,10 @@ class AstrologyCalculator:
             print(f"ephemery_string: {ephemery_string}")
             return None
     
-        zo = ephemery_string[2:4]
-        return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
+        zodiac_abreve = ephemery_string[2:4]
+        zodiac_degrees = self.ZODIAC_DEGREES[zodiac_abreve]
+        degrees_in_sign = int(self.get_degree(ephemery_string))
+        return(zodiac_degrees + degrees_in_sign)
 
 
     def organize_natal_house_info(self, log=False):
@@ -528,7 +530,13 @@ class AstrologyCalculator:
                         log)
                 
                 if aspect_name == None:
-                    self.log(log, f"No aspect found between Transit {planet1_info['degree']} degree {planet1_name} and Transit {planet2_info['degree']} degree {planet2_name}. Moving on to the next planet pair.\n")
+                    log_message = (
+                        f"No aspect between Transit " 
+                        f"{planet1_info['degree']} degree {planet1_name}"
+                        f" and Transit "
+                        f"{planet2_info['degree']} degree {planet2_name}."
+                    )
+                    self.log(log, log_message)
                     continue
 
                 aspect_info = self.organize_aspect_info(
@@ -589,8 +597,6 @@ class AstrologyCalculator:
 
     def check_aspects_for_2_planets(self, ephemery_string1, ephemery_string2, orb=0, log=False):
         """This method checks the aspects between two planets and returns the aspect name if there is one."""
-        self.log(log, "\nLogging check_aspects_for_2_planets:")
-
         aspect_name = self.check_aspect(ephemery_string1, ephemery_string2, orb=orb)
         if aspect_name == None:
             return None
@@ -1641,5 +1647,12 @@ da = DrawAstrology(
         IMPORTANT_GLYPH,
 )
 da.reset(CANVAS_WIDTH, CANVAS_HEIGHT, LAYER_LIST)
+row = ASTROLOGY_OBJECT.ephemeris_data[1]
+single_day_dict = ASTROLOGY_OBJECT.organize_day_ephemeris(
+    row, None, log=False)
+da.draw_day(0, INFO_LAYER, single_day_dict)
+
+"""
 organized_month_data = ASTROLOGY_OBJECT.organize_month_ephemeris(log=CALCULATOR_LOG)
 da.draw_month(organized_month_data)
+"""
