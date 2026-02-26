@@ -331,26 +331,30 @@ class AstrologyCalculator:
     
 
     def get_degree(self, ephemery_string):
-        """Returns a degree between 0 and 29 from an ephemeris string.
+        """Returns a degree between 0 and 29 as a string.
         
-        If the ephemery string is "15AR23", this method will return "15".
-        The first two characters of the ephemery string are the degree,
-        the next two characters are the zodiac sign abreviation,
-        and the last two characters are not used by this program.
+        If the ephemery string is "15AR23", it returns "15".
         """
         deg = ephemery_string[:2]
         return(deg)
     
     
     def get_full_degree(self, ephemery_string): 
-        """Returns a < 360 degree position."""
-        if type(ephemery_string) != int and type(ephemery_string) != str:
-            print("get_full_degree function received an ephemery_string that is not a string or int. Returning None.")
+        """Returns a < 360 degree position on a zodiac wheel.
+        
+        Aries is 0, Taurus is 30, 5 degrees of taurus is 35, etc.
+        """
+        if type(ephemery_string) != str:
+            # Catches arguments with the wrong data type.
+            error_message = (
+                "get_full_degree function received an "
+                "ephemery_string that is not a string or int. "
+                "Returning None.")
+            print(error_message)
+            print(f"ephemery_string: {ephemery_string}")
             return None
-        if type(ephemery_string) == str:
-            zo = ephemery_string[2:4]
-        elif type(ephemery_string) == int:
-            zo = ephemery_string
+    
+        zo = ephemery_string[2:4]
         return(self.ZODIAC_DEGREES[zo] + int(self.get_degree(ephemery_string)))
 
 
@@ -932,10 +936,10 @@ class AstrologyCalculator:
         self.log(log, "\nLogging organize_day_ephemeris:")
         from datetime import datetime, timedelta
         date_string = single_day_ephemeris_data[0]
-        self.log(True, f"Date string from ephemeris data: {date_string}")
+        self.log(log, f"Date string from ephemeris data: {date_string}")
         date_number = int(date_string[3:5])
         date_at_00_ut = datetime(self.year, self.month_num, date_number)
-        self.log(True, f"Date at 00:00 UT: {date_at_00_ut}")
+        self.log(log, f"Date at 00:00 UT: {date_at_00_ut}")
 
         # Handling time zones and daylight savings time
         date_in_time_zone = self.handle_timezones_and_dst(date_at_00_ut)
