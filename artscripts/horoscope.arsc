@@ -192,7 +192,9 @@ class AstrologyCalculator:
     }
 
 
-    def __init__(self, natal_planets, natal_houses, year_month, timezone="CT", orb=0, log=False):
+    def __init__(
+            self, natal_planets, natal_houses, year_month, 
+            timezone="CT", orb=0, log=False):
         print("\nInitializing AstrologyCalculator class.")
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
@@ -206,7 +208,7 @@ class AstrologyCalculator:
         self.orb = orb
         self.check_timezone()
         self.organize_natal_house_info(log)
-        print("Finished initializing AstrologyCalculator class.\n\n\n")
+        print("Finished initializing AstrologyCalculator.\n\n\n")
 
     
     def log(self, log, message, data=None):
@@ -229,31 +231,43 @@ class AstrologyCalculator:
 
     def check_timezone(self):  
         if self.timezone not in self.TIMEZONES:
-            print(f"Timezone '{self.timezone}' not found in TIMEZONES dictionary. Defaulting to 'CT'.")
+            message = (f"Timezone '{self.timezone}' not found. "
+                       "Defaulting to 'CT'.")
+            print(message)
             self.timezone = "UT"
 
 
     def test_natal_data(self, log=False):
+        """This method is for testing the imported natal data. 
+        
+        It will print the natal planets and houses to the console.
+        """
         if log == False:
             return
-
-        "This method is for testing the imported natal data. It will print the natal planets and houses to the console."
         print(f"Testing Natal Imports:")
         try:    
             print(f"Natal Planets:\n{self.natal_planets}\n")
         except ImportError:
-            print(f"Could not import NATAL_PLANETS: {self.natal_planets}. Possible filepath issue, or naming mismatch.")
-            print(" You will need to restart Playscii after fixing the issue.")
+            message = ("Could not import NATAL_PLANETS: "
+                       f"{self.natal_planets}. "
+                       "Possible filepath issue / naming mismatch."
+                       "\nYou will need to restart Playscii after "
+                       "fixing the issue.")
+            print(message)
 
         try:
             print(f"Natal Houses:\n{self.natal_houses}\n")
         except ImportError:
-            print(f"Could not import NATAL_HOUSES: {self.natal_houses}. Possible filepath issue, or naming mismatch.")
-            print(" You will need to restart Playscii after fixing the issue.")
-
+            message = ("Could not import NATAL_HOUSES: "
+                       f"{self.natal_houses}. "
+                       "Possible filepath issue / naming mismatch."
+                       "\nYou will need to restart Playscii after "
+                       "fixing the issue.")
+            print(message)
+          
 
     def get_natal_planet_degrees(self, log=False):
-        """This list can be scanned for specific degrees to trigger an aspect check."""
+        """The returned list is used to trigger an aspect check."""
         self.log(log, "\nLogging get_natal_planet_degrees:")
 
         natal_planet_degrees = []
@@ -261,23 +275,28 @@ class AstrologyCalculator:
             degree = self.get_degree(ephemery_string)
             natal_planet_degrees.append(degree)
         
-        self.log(log, "Finished logging get_natal_planet_degrees:", natal_planet_degrees)
+        self.log(
+            log, 
+            "Finished logging get_natal_planet_degrees:", 
+            natal_planet_degrees)
         return natal_planet_degrees
 
 
     def import_ephemeris(self, log=False):
-        """This method imports the ephemeris data for the current month and year. 
+        """Saves data from a csv file into self.ephemeris_data.
         
-        The ephemeris data can be copied from https://astrowin.org/ephemeris/index.php.
-        Then the copied data can be pasted into a spreadsheet, and exported as a csv.
-        The file must be named "ephemeris_yyyy-mm.csv" and placed in the /artscripts/horoscope_files directory.
-        It will save the data in a variable called self.ephemeris_data.
+        The ephemeris data can be copied from 
+        https://astrowin.org/ephemeris/index.php.
+        Then the copied data can be pasted into a spreadsheet, 
+        and exported as a csv.
+        The file must be named "ephemeris_yyyy-mm.csv", 
+        and placed in the /artscripts/horoscope_files directory.
         """
         import os
         import csv
         csvfilename = f'ephemeris_{self.year_month}.csv'
         cwd = os.getcwd()
-        csv_filepath = cwd + "/artscripts/horoscope_files/" + csvfilename
+        csv_filepath = f"{cwd}/artscripts/horoscope_files/{csvfilename}"
         self.ephemeris_data = []
         
         with open(csv_filepath) as csv_file:
