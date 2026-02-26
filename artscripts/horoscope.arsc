@@ -30,7 +30,7 @@ CANVAS_HEIGHT = 54
 LAYER_LIST = ['info', 'reductive']
 INCLUDE_NATAL_INFO = True
 IMPORTANT_GLYPH = 50
-TIMEZONE = "central"
+TIMEZONE = "CT"
 ORB = 0
 CALCULATOR_LOG = False
 
@@ -46,7 +46,7 @@ class AstrologyCalculator:
     """This class will contain all the methods for calculating astrological information based on the natal chart."""
     TIMEZONES = {
         "UT": 0,
-        "central": -6,
+        "CT": -6,
     }
     PLANET_DICT = {
         1: "sun",
@@ -192,7 +192,7 @@ class AstrologyCalculator:
     }
 
 
-    def __init__(self, natal_planets, natal_houses, year_month, timezone="central", orb=0, log=False):
+    def __init__(self, natal_planets, natal_houses, year_month, timezone="CT", orb=0, log=False):
         print("\nInitializing AstrologyCalculator class.")
         self.natal_planets = natal_planets
         self.natal_houses = natal_houses
@@ -229,7 +229,7 @@ class AstrologyCalculator:
 
     def check_timezone(self):  
         if self.timezone not in self.TIMEZONES:
-            print(f"Timezone '{self.timezone}' not found in TIMEZONES dictionary. Defaulting to 'central'.")
+            print(f"Timezone '{self.timezone}' not found in TIMEZONES dictionary. Defaulting to 'CT'.")
             self.timezone = "UT"
 
 
@@ -701,7 +701,8 @@ class AstrologyCalculator:
     def organize_planet_ephemeris(
             self, 
             planet, 
-            ephemery_string, 
+            ephemery_string,
+            yesterday_planet_info=None,
             log=False):
         """This method organizes the ephemeris data for a single planet into a dictionary. 
         It uses the get_sign, get_degree, get_house, check_retro, and check_dignity methods to get the necessary information.
@@ -715,6 +716,45 @@ class AstrologyCalculator:
             "planet": planet,
             "ephemery_string": ephemery_string
         }
+        if yesterday_planet_info == False:
+            yesterday_planet_info = None
+
+        if yesterday_planet_info == None:
+            planet_info["zodiac_changed"] = " "
+            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['zodiac_changed']}'")
+            planet_info["house_changed"] = " "
+            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['house_changed']}'")
+            planet_info["retrograde_changed"] = " "
+            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['retrograde_changed']}'")
+
+        else:
+            previous_sign = yesterday_planet_info["sign"]
+            current_sign = planet_info["sign"]
+            if previous_sign != current_sign:
+                planet_info["zodiac_changed"] = "Z"
+            else:
+                planet_info["zodiac_changed"] = " "
+                self.log(log, f"Zodiac sign did not change for {planet}. Setting change indicator to '{planet_info['zodiac_changed']}'")
+
+            previous_house = yesterday_planet_info["house"]
+            current_house = planet_info["house"]
+            if previous_house != current_house:
+                planet_info["house_changed"] = "H"
+            else:
+                planet_info["house_changed"] = " "
+                self.log(log, f"House did not change for {planet}. Setting change indicator to '{planet_info['house_changed']}'")
+
+            previous_retrograde = yesterday_planet_info["retrograde"]
+            current_retrograde = planet_info["retrograde"]
+            if previous_retrograde != current_retrograde:
+                if previous_retrograde == "R" and current_retrograde == " ":
+                    planet_info["retrograde_changed"] = "D"
+                else:
+                    planet_info["retrograde_changed"] = "R"
+            else:
+                planet_info["retrograde_changed"] = " "
+                self.log(log, f"Retrograde status did not change for {planet}. Setting change indicator to '{planet_info['retrograde_changed']}'")
+
         if log == True:
             print(f"Logging organize_planet_ephemeris data for planet: {planet}")
             for key, value in planet_info.items():
@@ -770,7 +810,7 @@ class AstrologyCalculator:
         print("Finished organizing aspect info\n")
 
 
-    def organize_all_planets_info_for_day(self, single_day_ephemeris_data, log=False):
+    def organize_all_planets_info_for_day(self, single_day_ephemeris_data, previous_day_ephemeris_data=None, log=False):
         """This method organizes the ephemeris data for a single day into a dictionary.
         
         single_day_ephemeris_data is one row of the ephemeris data imported from the csv file."""
@@ -783,9 +823,14 @@ class AstrologyCalculator:
         all_planet_info_for_day = {}
         for column, planet_name in self.PLANET_DICT.items():          
             ephemery_string = single_day_ephemeris_data[column]
+            if previous_day_ephemeris_data is not None:
+                yesterday_planet_info = previous_day_ephemeris_data[planet_name]
+            else:
+                yesterday_planet_info = None
             planet_info = self.organize_planet_ephemeris(
                     planet_name,
                     ephemery_string,
+                    yesterday_planet_info,
                     log=log
             )
             all_planet_info_for_day[planet_name] = planet_info
@@ -866,18 +911,19 @@ class AstrologyCalculator:
     def organize_day_ephemeris(
             self, 
             single_day_ephemeris_data,
+            previous_day_ephemeris_data=None,
             log=False):
         """This method organizes the ephemeris data for a single day into a dictionary. 
         
         Offset date and time are for adjusting for different time zones.
-
-        TODO The returned dictionary should also include aspect information.
         """
         self.log(log, "\nLogging organize_day_ephemeris:")
         from datetime import datetime, timedelta
         date_string = single_day_ephemeris_data[0]
+        self.log(True, f"Date string from ephemeris data: {date_string}")
         date_number = int(date_string[3:5])
         date_at_00_ut = datetime(self.year, self.month_num, date_number)
+        self.log(True, f"Date at 00:00 UT: {date_at_00_ut}")
 
         # Handling time zones and daylight savings time
         date_in_time_zone = self.handle_timezones_and_dst(date_at_00_ut)
@@ -889,6 +935,7 @@ class AstrologyCalculator:
 
         all_planet_info_for_day = self.organize_all_planets_info_for_day(
                 single_day_ephemeris_data, 
+                previous_day_ephemeris_data,
                 log)
           
         equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
@@ -903,6 +950,7 @@ class AstrologyCalculator:
         complete_day_dict = {
             "date_at_00:00 UT": date_at_00_ut,
             "date_at_local_time": date_in_time_zone,
+            "timezone": self.timezone,
             "weekday_name": weekday_name,
             "day_ruling_planet" : day_ruling_planet,
             "month_name": month_name,
@@ -936,12 +984,27 @@ class AstrologyCalculator:
         return complete_day_dict
 
 
+    def organize_month_ephemeris(self, log=False):
+        """This method organizes the ephemeris data for a month into a dictionary. 
+        
+        It loops through each day in the month and organizes the ephemeris data for that day using the organize_day_ephemeris method.
+        """
+        month_list = []
+        for count, row in enumerate(self.ephemeris_data):
+            if month_list == []:
+                previous_day_ephemeris_data = None
+            else:
+                previous_day_ephemeris_data = month_list[count-1]["all_planet_positions"]
+            single_day_dict = self.organize_day_ephemeris(row, previous_day_ephemeris_data, log)
+            month_list.append(single_day_dict)
+        return month_list
+
 ASTROLOGY_OBJECT = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH, timezone=TIMEZONE, orb=ORB, log=CALCULATOR_LOG)
 
 
 
 single_row_from_csv = ASTROLOGY_OBJECT.ephemeris_data[ROW_TO_CALCULATE]
-ASTROLOGY_OBJECT.organize_day_ephemeris(single_row_from_csv, log=CALCULATOR_LOG)
+ASTROLOGY_OBJECT.organize_month_ephemeris(log=CALCULATOR_LOG)
 
 
 class DrawAstrology():
@@ -992,6 +1055,14 @@ class DrawAstrology():
         "3circle_solid_0":221,
         "3circle_solid_1":222,
         "2ramp_1":262,
+        "conjunct":94,
+        "sextile":95,
+        "square":96,
+        "trine":97,
+        "inconjunct":98,
+        "opposing":99,
+        "3circle_line_0":181,
+        "3circle_line_1":182,
     }
     def __init__(
             self, 
@@ -1007,7 +1078,7 @@ class DrawAstrology():
             color, 
             bg_color, 
             include_natal_info, 
-            important_degree_glyph
+            important_degree_glyph,
         ):
         self.info_layer = info_layer
         self.reductive_layer = reductive_layer
@@ -1023,7 +1094,6 @@ class DrawAstrology():
         self.art_obj = art_obj
         self.include_natal_info = include_natal_info
         self.important_degree_glyph = important_degree_glyph
-
 
     def quick_write(self, frame, layer, x, y, string):
         """This accesses the art object's write_string method.
@@ -1105,11 +1175,8 @@ class DrawAstrology():
         if fg_color == None: fg_color = self.color
         if bg_color == None: bg_color = self.bg_color
         if transform == None: transform = 0
-        try:
-            self.art_obj.set_tile_at(frame, layer, x, y, tile, fg_color, bg_color, transform)
-        except Exception as e:
-            print(f"Error setting tile at ({x}, {y}): {e}")
-            print(f"Tile: {tile}, x: {x}, y: {y}, width: {self.art_obj.width}, height: {self.art_obj.height}")
+    
+        self.art_obj.set_tile_at(frame, layer, x, y, tile, fg_color, bg_color, transform)
 
 
     def write_sideways(self, frame, layer, x, y, string, fg_color, bg_color=None):
@@ -1185,7 +1252,7 @@ class DrawAstrology():
                                      fg_color, bg_color, 3
             )
 
-    def draw_change_in(self, x, y):
+    def draw_change_in(self, frame, layer, x, y):
         self.quick_write(frame, layer, x, y, "Change In:")
         
         
@@ -1220,7 +1287,11 @@ class DrawAstrology():
             layer,
             month_name,
             day_ruling_planet,
-            weekday_name):
+            weekday_name,
+            current_date,
+            timezone="UT",
+            time="00:00"
+            ):
         """Draws the header for the month.
         
         Occupies an 8x2 space. The first row says the month,
@@ -1228,14 +1299,15 @@ class DrawAstrology():
         The second row says "00:00 UT".
         """
         x, y = self.header_coords[0], self.header_coords[1]
-        current_date = self.frame+1
         month_abrev = month_name[0:3].capitalize()
         date_string = f'{month_abrev} {current_date}'
         print("\n\n")
         self.quick_write(frame, layer, x, y, date_string)
         self.quick_tile(frame, layer, x+7, y, self.TILE_INDEX[day_ruling_planet])
         self.quick_write(frame, layer, x, y+1, weekday_name)
-        self.quick_write(frame, layer, x, y+2, "00:00 UT")
+        
+        self.quick_write(frame, layer, x, y+2, time + " " + timezone)
+
         self.quick_write(frame, layer, x+12, y, "Data from")
         self.quick_write(frame, layer, x+12, y+1, "Astrowin")
         #self.draw_change_in(x+10, y)
@@ -1268,6 +1340,9 @@ class DrawAstrology():
             house = self.TILE_INDEX[f"roman_{house_number}"] # The tile
             retrograde = planet["retrograde"]
             dignity = planet["dignity"]
+            zodiac_changed = planet["zodiac_changed"]
+            house_changed = planet["house_changed"]
+            retrograde_changed = planet["retrograde_changed"]
 
             self.quick_write(frame, layer, x+2, y+ephemery_y_cursor, str(degree)) # degree
             self.quick_tile(frame, layer, x+5, y+ephemery_y_cursor, planet_tile) # todays planet
@@ -1275,12 +1350,12 @@ class DrawAstrology():
             if self.include_natal_info:
                 self.quick_tile(frame, layer, x+7, y+ephemery_y_cursor, str(house)) # house
             self.quick_write(frame, layer, x+8, y+ephemery_y_cursor, retrograde) # retrograde status
-            """
-            self.quick_write(frame, layer, x+16, y+ephemery_y_cursor, ephem_dict["zodiac_changed"]) # if sign changed since yesterday
+
+            self.quick_write(frame, layer, x+16, y+ephemery_y_cursor, zodiac_changed) # if sign changed since yesterday
             if self.include_natal_info:
-                self.quick_write(frame, layer, x+17, y+ephemery_y_cursor, ephem_dict["house_changed"]) # if house changed since yesterday
-            self.quick_write(frame, layer, x+18, y+ephemery_y_cursor, ephem_dict["station_changed"]) # if retrograde station changed since yesterday
-            """
+                self.quick_write(frame, layer, x+17, y+ephemery_y_cursor, house_changed) # if house changed since yesterday
+            self.quick_write(frame, layer, x+18, y+ephemery_y_cursor, retrograde_changed) # if retrograde station changed since yesterday
+
             self.quick_write(frame, layer, x+10, y+ephemery_y_cursor, dignity) # writes the planets dignity status or a " "  
             ephemery_y_cursor += 1
 
@@ -1300,9 +1375,8 @@ class DrawAstrology():
         The phase is used to determine the moon's shape.
         0 is a new moon, 7 is a full moon.
         """
-        #always rounds out top
-        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 0)
-        self.art_obj.set_tile_at(self.frame, self.reductive_layer, x+1, y+2, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 2)
+
+        
         if phase == 0:	
             self.quick_tile(frame, layer, x, y, self.TILE_INDEX["3circle_line_0"])
             self.quick_tile(frame, layer, x, y+1, self.TILE_INDEX["3circle_line_1"], transform=3)
@@ -1352,6 +1426,9 @@ class DrawAstrology():
             self.quick_tile(frame, layer, x+2, y+1, self.TILE_INDEX["3circle_solid_1"], transform=1)
             self.quick_tile(frame, layer, x+2, y+2, self.TILE_INDEX["3circle_solid_0"], transform=2)
 
+        #always rounds out top
+        self.art_obj.set_tile_at(frame, layer+1, x+1, y, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 0)
+        self.art_obj.set_tile_at(frame, layer+1, x+1, y+2, self.TILE_INDEX["3circle_solid_1"], 0, self.bg_color, 2)
 
     def draw_sun_data(self, frame, layer, zodiac_name, sun_degree):
         """Draws the sun data for the day.
@@ -1375,7 +1452,6 @@ class DrawAstrology():
         sign, and a picture of the moon phase.
         """
         x, y = self.moon_data_coords[0], self.moon_data_coords[1]
-        current_date = self.frame+1
         phase_index = phase
         zodiac_name = sign
         zodiac_glyph = self.TILE_INDEX[zodiac_name]
@@ -1397,20 +1473,20 @@ class DrawAstrology():
         if self.include_natal_info is True, it also lists the house of each planet.
         """
         for count, aspect_dict in enumerate(aspect_list):
-            if None in aspect_dict.values():
-                print(aspect_dict)
             if self.include_natal_info:
                 if aspect_dict["important"] == True:
                     self.quick_tile(frame, layer, x+18, y+count, self.important_degree_glyph)
-                self.quick_tile(frame, layer, x+6, y+count, aspect_dict["house_1"])	
-                self.quick_tile(frame, layer, x+12, y+count, aspect_dict["house_2"])
+                house_1_tile = self.TILE_INDEX[f"roman_{aspect_dict['house_1']}"]
+                house_2_tile = self.TILE_INDEX[f"roman_{aspect_dict['house_2']}"]
+                self.quick_tile(frame, layer, x+6, y+count, house_1_tile)	
+                self.quick_tile(frame, layer, x+12, y+count, house_2_tile)
             self.quick_write(frame, layer, x+1, y+count, aspect_dict["degree_1"]) #1st degree
-            self.quick_tile(frame, layer, x+4, y+count, aspect_dict["planet_1"]) #transiting planet
-            self.quick_tile(frame, layer, x+5, y+count, aspect_dict["zodiac_1"]) #transiting sign	
+            self.quick_tile(frame, layer, x+4, y+count, self.TILE_INDEX[aspect_dict["planet_1"]]) #transiting planet
+            self.quick_tile(frame, layer, x+5, y+count, self.TILE_INDEX[aspect_dict["zodiac_1"]]) #transiting sign	
             self.quick_write(frame, layer, x+7, y+count, aspect_dict["station_1"]) #retrograde status
-            self.quick_tile(frame, layer, x+8, y+count, aspect_dict["aspect"])#aspect
-            self.quick_tile(frame, layer, x+10, y+count, aspect_dict["planet_2"])#natal planet
-            self.quick_tile(frame, layer, x+11, y+count, aspect_dict["zodiac_2"]) #natal sign
+            self.quick_tile(frame, layer, x+8, y+count, self.TILE_INDEX[aspect_dict["aspect"]])#aspect
+            self.quick_tile(frame, layer, x+10, y+count, self.TILE_INDEX[aspect_dict["planet_2"]])#natal planet
+            self.quick_tile(frame, layer, x+11, y+count, self.TILE_INDEX[aspect_dict["zodiac_2"]]) #natal sign
             self.quick_write(frame, layer, x+13, y+count, aspect_dict["station_2"]) #retrograde status
             self.quick_write(frame, layer, x+14, y+count, aspect_dict["degree_2"]) #degree
 
@@ -1464,12 +1540,16 @@ class DrawAstrology():
             art_obj.add_frame_to_end()
 
 
-    def draw_day(self, frame, layer, current_date, organized_day_data):
+    def draw_day(self, frame, layer, organized_day_data):
         """Draws the data for a single day."""
         month_name = organized_day_data["month_name"]
         day_ruling_planet = organized_day_data["day_ruling_planet"]
         weekday_name = organized_day_data["weekday_name"]
-        self.draw_header(frame, layer, month_name, day_ruling_planet, weekday_name)
+        current_datetime = organized_day_data["date_at_local_time"]
+        two_digit_date = str(current_datetime)[8:10]
+        timezone = organized_day_data["timezone"]
+        time = str(current_datetime)[11:16]
+        self.draw_header(frame, layer, month_name, day_ruling_planet, weekday_name, two_digit_date, timezone, time)
 
         all_planet_positions = organized_day_data["all_planet_positions"]
         self.draw_ephemery_info(frame, layer, all_planet_positions)
@@ -1490,24 +1570,26 @@ class DrawAstrology():
         transits_aspecting_natal = organized_day_data["transits_aspecting_natal"]
         transits_aspecting_eachother = organized_day_data["transits_aspecting_each_other"]
         self.draw_transit_data(frame, layer, transits_aspecting_natal, transits_aspecting_eachother)
-        self.add_frame_check(self.art_obj)
-        self.quick_border(0, 0, self.art_obj.width, self.art_obj.height)
+        self.quick_border(frame, layer, 0, 0, self.art_obj.width, self.art_obj.height)
         excluded_layers = ["info", "reductive"]
         self.art_obj.set_all_bg_colors(self.bg_color, excluded_layers)
 
 
-    def draw_month(self):
+    def draw_month(self, organized_month_data):
         """Draws the data for the entire month."""
-        import calendar
-        last_day = self.get_month_range()
-        for current_date in range(1,last_day+1):
-            self.frame = current_date - 1
-            self.draw_day(current_date)
-        excluded_layers = ["info", "reductive"]
-        self.art_obj.set_all_bg_colors(self.bg_color, excluded_layers)
+        frame = -1
+        for day in organized_month_data:
+            if frame != -1: #skips adding a frame before the first day
+                self.art_obj.add_frame_to_end()
+            frame += 1
+            self.draw_day(frame, self.info_layer, day)
+
+
 
 
     def reset(self, xsize, ysize, layer_list):
+        self.art_obj.set_charset_by_name("dps_charset_v27-2")
+        self.art_obj.set_palette_by_name("dps_palette_v11_2")
         self.art_obj.resize(xsize, ysize)
         while self.art_obj.frames > 1: #resets art to 1 frame
             self.art_obj.delete_frame_at(1)
@@ -1535,8 +1617,8 @@ da = DrawAstrology(
         COLOR,
         BG_COLOR, 
         INCLUDE_NATAL_INFO, 
-        IMPORTANT_GLYPH)
-
+        IMPORTANT_GLYPH,
+)
 da.reset(CANVAS_WIDTH, CANVAS_HEIGHT, LAYER_LIST)
-organized_day_data = ASTROLOGY_OBJECT.organize_day_ephemeris(single_row_from_csv, log=CALCULATOR_LOG)
-da.draw_day(0, 1, 1, organized_day_data)
+organized_month_data = ASTROLOGY_OBJECT.organize_month_ephemeris(log=CALCULATOR_LOG)
+da.draw_month(organized_month_data)
