@@ -1673,7 +1673,9 @@ class DrawAstrology():
         two_digit_date = str(current_datetime)[8:10]
         timezone = organized_day_data["timezone"]
         time = str(current_datetime)[11:16]
-        self.draw_header(frame, layer, month_name, day_ruling_planet, weekday_name, two_digit_date, timezone, time)
+        self.draw_header(
+            frame, layer, month_name, day_ruling_planet, 
+            weekday_name, two_digit_date, timezone, time)
 
         all_planet_positions = organized_day_data["all_planet_positions"]
         self.draw_ephemery_info(frame, layer, all_planet_positions)
@@ -1693,10 +1695,15 @@ class DrawAstrology():
         )
         transits_aspecting_natal = organized_day_data["transits_aspecting_natal"]
         transits_aspecting_eachother = organized_day_data["transits_aspecting_each_other"]
-        self.draw_transit_data(frame, layer, transits_aspecting_natal, transits_aspecting_eachother)
-        self.quick_border(frame, layer, 0, 0, self.art_obj.width, self.art_obj.height)
+        self.draw_transit_data(
+            frame, layer, transits_aspecting_natal, 
+            transits_aspecting_eachother)
+        self.quick_border(
+            frame, layer, 0, 0, self.art_obj.width
+            , self.art_obj.height)
         excluded_layers = ["info", "reductive"]
-        self.art_obj.set_all_bg_colors(self.bg_color, excluded_layers)
+        self.art_obj.set_all_bg_colors(
+            self.bg_color, excluded_layers)
 
 
     def draw_month(self, organized_month_data):
@@ -1709,15 +1716,15 @@ class DrawAstrology():
             self.draw_day(frame, self.info_layer, day)
 
 
-
-
     def reset(self, xsize, ysize, layer_list):
         self.art_obj.set_charset_by_name("dps_charset_v27-2")
         self.art_obj.set_palette_by_name("dps_palette_v11_2")
         self.art_obj.resize(xsize, ysize)
-        while self.art_obj.frames > 1: #resets art to 1 frame
+        # Resets art to 1 frame
+        while self.art_obj.frames > 1: 
             self.art_obj.delete_frame_at(1)
-        while self.art_obj.layers > 1: #resets to one layer before adding the second layer
+        # Resets to one layer before adding the second layer
+        while self.art_obj.layers > 1: 
             self.art_obj.delete_layer(1)
         while self.art_obj.layers > 1:
             self.art_obj.delete_layer(1)
@@ -1725,7 +1732,6 @@ class DrawAstrology():
         self.art_obj.clear_frame_layer(0, 0, 0)
         for layer in layer_list:
             self.art_obj.add_layer(0, layer)
-
 
 
 da = DrawAstrology(
