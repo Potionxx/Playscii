@@ -1549,9 +1549,11 @@ class DrawAstrology():
         the sun's degree, and an image of the sun.
         """
         x, y = self.sun_data_coords[0], self.sun_data_coords[1]
-        self.block_border(frame, layer, x, y, 10, 8, self.color, self.bg_color) #sun border
+        # Sun border
+        self.block_border(frame, layer, x, y, 10, 8, self.color, self.bg_color) 
         self.draw_sun(frame, layer, x+2, y+1)        
-        self.quick_border(frame, layer, x+5, y+1, 4, 3) #sun degree border
+        # Sun degree border
+        self.quick_border(frame, layer, x+5, y+1, 4, 3) 
         self.quick_write(frame, layer, x+1, y+5, zodiac_name.capitalize())
         self.quick_write(frame, layer, x+1, y+6, "Zodiac")
         self.quick_write(frame, layer, x+6, y+2, sun_degree)
@@ -1572,8 +1574,10 @@ class DrawAstrology():
 
         self.block_border(frame, layer, x, y, 10, 8, self.color, self.bg_color) #moon border
         self.draw_moon(frame, layer, x+2, y+1, phase_index)
-        self.quick_tile(frame, layer, x+7, y+2, zodiac_glyph) #moon sign
-        self.quick_border(frame, layer, x+6, y+1, 3, 3) #moon sign border
+        # Moon sign
+        self.quick_tile(frame, layer, x+7, y+2, zodiac_glyph)
+        # Moon sign border
+        self.quick_border(frame, layer, x+6, y+1, 3, 3) 
         self.quick_write(frame, layer, x+2, y+5, phase_name_1)
         self.quick_write(frame, layer, x+2, y+6, phase_name_2)
 
@@ -1592,23 +1596,34 @@ class DrawAstrology():
                 house_2_tile = self.TILE_INDEX[f"roman_{aspect_dict['house_2']}"]
                 self.quick_tile(frame, layer, x+6, y+count, house_1_tile)	
                 self.quick_tile(frame, layer, x+12, y+count, house_2_tile)
-            self.quick_write(frame, layer, x+1, y+count, aspect_dict["degree_1"]) #1st degree
-            self.quick_tile(frame, layer, x+4, y+count, self.TILE_INDEX[aspect_dict["planet_1"]]) #transiting planet
-            self.quick_tile(frame, layer, x+5, y+count, self.TILE_INDEX[aspect_dict["zodiac_1"]]) #transiting sign	
-            self.quick_write(frame, layer, x+7, y+count, aspect_dict["station_1"]) #retrograde status
-            self.quick_tile(frame, layer, x+8, y+count, self.TILE_INDEX[aspect_dict["aspect"]])#aspect
-            self.quick_tile(frame, layer, x+10, y+count, self.TILE_INDEX[aspect_dict["planet_2"]])#natal planet
-            self.quick_tile(frame, layer, x+11, y+count, self.TILE_INDEX[aspect_dict["zodiac_2"]]) #natal sign
-            self.quick_write(frame, layer, x+13, y+count, aspect_dict["station_2"]) #retrograde status
-            self.quick_write(frame, layer, x+14, y+count, aspect_dict["degree_2"]) #degree
+            # 1st degree
+            self.quick_write(frame, layer, x+1, y+count, aspect_dict["degree_1"]) 
+            # Transiting planet
+            self.quick_tile(frame, layer, x+4, y+count, self.TILE_INDEX[aspect_dict["planet_1"]])
+            # Transiting sign
+            self.quick_tile(frame, layer, x+5, y+count, self.TILE_INDEX[aspect_dict["zodiac_1"]]) 
+            # Retrograde status	
+            self.quick_write(frame, layer, x+7, y+count, aspect_dict["station_1"]) 
+            # Aspect
+            self.quick_tile(frame, layer, x+8, y+count, self.TILE_INDEX[aspect_dict["aspect"]])
+            # Natal planet
+            self.quick_tile(frame, layer, x+10, y+count, self.TILE_INDEX[aspect_dict["planet_2"]])
+            # Natal sign
+            self.quick_tile(frame, layer, x+11, y+count, self.TILE_INDEX[aspect_dict["zodiac_2"]]) 
+            # Retrograde status
+            self.quick_write(frame, layer, x+13, y+count, aspect_dict["station_2"]) 
+             # Degree
+            self.quick_write(frame, layer, x+14, y+count, aspect_dict["degree_2"])
 
 
-    def draw_transit_data(self, frame, layer, transits_aspecting_natal, transits_aspecting_eachother):
+    def draw_transit_data(
+            self, frame, layer, transits_aspecting_natal, 
+            transits_aspecting_eachother):
         """Draws the transit data for the day.
         
-        Occupies a 17 wide space. It's height depends on the number of aspects.
+        It's height depends on the number of aspects.
         If self.include_natal_info is True, it also lists the aspects between
-        transiting and natal planets in a second 17 wide space, drawn under the first.
+        transiting and natal planets in a second space, drawn under the first.
         """
         x = self.transit_data_coords[0] 
         y = self.transit_data_coords[1]
@@ -1618,9 +1633,12 @@ class DrawAstrology():
         transit_border_height = max(1, number_of_transit_aspects)+2
 
         self.quick_write(frame, layer, x+1, y, 'Aspect at 0 Orb')
-        self.block_border(frame, layer, x, y+1, 19, transit_border_height, self.color, self.bg_color) 
+        self.block_border(
+            frame, layer, x, y+1, 19, transit_border_height, 
+            self.color, self.bg_color) 
         if transits_aspecting_eachother != []:	
-            self.draw_aspect_list(frame, layer, x+1, y+2, transits_aspecting_eachother)
+            self.draw_aspect_list(
+                frame, layer, x+1, y+2, transits_aspecting_eachother)
             
         else:
             self.quick_write(frame, layer, x+4, y+2, 'No aspects')
@@ -1629,7 +1647,9 @@ class DrawAstrology():
             natal_border_height = max(1, number_of_natal_aspects)+2
             y+=transit_border_height+2
             self.quick_write(frame, layer, x+1, y, 'Transit / Natal')
-            self.block_border(frame, layer, x, y+1, 19, natal_border_height, self.color, self.bg_color)
+            self.block_border(
+                frame, layer, x, y+1, 19, natal_border_height, 
+                self.color, self.bg_color)
             if transits_aspecting_natal != []:
                 self.draw_aspect_list(frame, layer, x+1, y+2, transits_aspecting_natal)
             else:
@@ -1648,7 +1668,9 @@ class DrawAstrology():
         """Used in the draw_month method to add a frame if the month isn't over."""
         current_date = self.frame+1
         month_range = self.get_month_range()
-        if current_date < month_range: #change this to variable later to accord with different month sizes. or just remove this
+        
+        # Change this to variable later to accord with different month sizes. or just remove this
+        if current_date < month_range: 
             art_obj.add_frame_to_end()
 
 
