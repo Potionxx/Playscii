@@ -1383,35 +1383,7 @@ class DrawAstrology():
                 fg_color, bg_color, 3
             )
 
-    def draw_change_in(self, frame, layer, x, y):
-        self.quick_write(frame, layer, x, y, "Change In:")
-        
-        
-        # Draws the connecting lines for Retro
-        self.quick_write(frame, layer, x, y+2, "Retro")
-        for i in range(3):
-            self.quick_tile(frame, layer, x+5+i, y+2, 206)
-
-        self.quick_tile(frame, layer, x+8, y+2, 207, transform = 1)
-        for i in range(5):
-            self.quick_tile(frame, layer, x+8, y+3+i, 206, transform = 1)
-
-        # Draws the connecting lines for house
-        self.quick_write(frame, layer, x, y+4, "House")
-        self.quick_tile(frame, layer, x+5, y+4, 206)
-        self.quick_tile(frame, layer, x+6, y+4, 206)
-
-        self.quick_tile(frame, layer, x+7, y+4, 207, transform = 1)
-
-        for i in range(3):
-            self.quick_tile(frame, layer, x+7, y+5+i, 206, transform = 1)
-        
-        # Draws connecting lines for zodiac         
-        self.quick_write(frame, layer, x, y+6, "Zodiac")
-        self.quick_tile(frame, layer, x+6, y+6, 207, transform = 1)
-        self.quick_tile(frame, layer, x+6, y+7, 206, transform = 1)
-        
-        
+   
     def draw_header(
             self,
             frame,
@@ -1441,7 +1413,6 @@ class DrawAstrology():
 
         self.quick_write(frame, layer, x+12, y, "Data from")
         self.quick_write(frame, layer, x+12, y+1, "Astrowin")
-        #self.draw_change_in(x+10, y)
         self.write_sideways(frame, layer, 23, 7, "NEW CHANGES", self.color)
 
 
