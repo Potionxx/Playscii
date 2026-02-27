@@ -533,7 +533,7 @@ class AstrologyCalculator:
 
     def get_all_transit_only_aspects_for_day(
             self, all_planet_info_for_day, orb=0, log=False):
-        """Returns a detailed list of all transit-only aspects.
+        """Returns a detailed list of transit-only aspects.
          
            Each list item is a dictionary of info."""
         method_name = "get_all_transit_only_aspects_for_day"
@@ -606,6 +606,7 @@ class AstrologyCalculator:
             " in the degrees to check:"
         )
         self.log(log, log_message)
+
         for transit_planet_name in planet_names:
             transit_planet_info = all_planet_info_for_day[transit_planet_name]
             degree = transit_planet_info["degree"]
@@ -654,14 +655,15 @@ class AstrologyCalculator:
     
 
     def check_aspects_between_1_transit_and_all_natal(self, transit_planet_info,  orb=0, log=False):
-        """This method checks the aspects between one natal planet and all the daily transiting planets, and returns a list of aspect info dictionaries."""
+        """Is there an easier way? Well this is how we find natal transits."""
         aspect_info = []
         transit_planet_ephemery_string = transit_planet_info["ephemery_string"]
         transit_planet_name = transit_planet_info["planet"]
-
-        message = f"running check aspects between 1 transit ({transit_planet_name}: {transit_planet_ephemery_string}) and all natal:"
-
-        self.log(log, message)
+        log_message = (
+            "running check aspects between 1 transit "
+            f"({transit_planet_name}: {transit_planet_ephemery_string}) "
+            "and all natal:")
+        self.log(log, log_message)
 
         for natal_planet_name, natal_ephemery_string in self.natal_planets.items():
             # If there's no aspect, move on to the next planet.
@@ -675,27 +677,33 @@ class AstrologyCalculator:
                 self.log(log, log_message)
                 continue
             
-            # If there is an aspect, organize the aspect info into a dictionary and add it to the list of aspect info dictionaries.
-            aspect_name = self.check_aspect_name(transit_planet_ephemery_string, natal_ephemery_string, orb=orb)
+            # Organize the aspect info into 
+            # a dictionary and add it to the list.
+            aspect_name = self.check_aspect_name(
+                transit_planet_ephemery_string, 
+                natal_ephemery_string, 
+                orb=orb)
             natal_planet_info = self.organize_planet_ephemeris(
                     natal_planet_name, natal_ephemery_string, log=log)
-
-            self.log(log, f"{aspect_name} found between transit {transit_planet_name} and natal {natal_planet_name}: {aspect_name}.")
+            log_message = (
+                f"{aspect_name} found between transit "
+                f"{transit_planet_name} and natal "
+                f"{natal_planet_name}: {aspect_name}."
+            )
+            self.log(log, log_message)
 
             single_aspect_info_dict = self.organize_aspect_info(
-                    transit_planet_info, 
-                    natal_planet_info, 
-                    aspect_name, 
-                    log)
+                    transit_planet_info, natal_planet_info, 
+                    aspect_name, log)
             aspect_info.append(single_aspect_info_dict)
             self.log(log, "aspect info dictionary added to aspect_info list.")
 
-        # After looping through all the natal planets, log the aspect info found for this transit planet.
+        # After looping through all the natal planets, 
+        # log the aspect info found for this transit planet.
         if log == True:
-            print(f"\nFinished {message} Aspect info found:")
+            print(f"\nFinished {log_message} Aspect info found:")
             for item in aspect_info:
                 self.log_aspect_info(item)
-
         return aspect_info
 
 
@@ -717,19 +725,19 @@ class AstrologyCalculator:
                 if lower_degree < 0:
                     lower_degree += 30
                 
-                if upper_degree not in degrees_to_check_for_aspects and upper_degree not in natal_degrees:
+                if (upper_degree not in degrees_to_check_for_aspects and 
+                    upper_degree not in natal_degrees):
+                    # Since it's not already in the list, add it.
                     degrees_to_check_for_aspects.append(upper_degree)
                     self.log(log, f"\tAdding degree {upper_degree}")
-                else:
-                    self.log(log, f"\tNot adding degree {upper_degree} because it's already in the list or it's a natal degree.")
 
-                if lower_degree not in degrees_to_check_for_aspects and lower_degree not in natal_degrees:
+                if (lower_degree not in degrees_to_check_for_aspects and 
+                    lower_degree not in natal_degrees):
+                    # Since it's not already in the list, add it.
                     degrees_to_check_for_aspects.append(lower_degree)
                     self.log(log, f"\tAdding degree {lower_degree}")
-                else:
-                    self.log(log, f"\tNot adding degree {lower_degree} because it's already in the list or it's a natal degree.")
 
-        degrees_to_check_for_aspects = degrees_to_check_for_aspects + natal_degrees
+        degrees_to_check_for_aspects += natal_degrees
         if log == True:
             print(f"Finished logging {method_name}")
             print("Returning: ", degrees_to_check_for_aspects)
