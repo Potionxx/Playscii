@@ -756,7 +756,12 @@ class AstrologyCalculator:
 
 
     def check_moon_phase(self, sundeg, moondeg):
-        """The sun and moon degrees are used to calculate the moon phase"""
+        """Returns phase index 0 - 7. 0 is new moon.
+        
+        This can actually be written a lot shorter, but 
+        I don't understand the shorter version.
+        Need to brush up on using % and // operators.
+        """
         #the degree is turned into a 0 < 360 position
         sundeg = self.get_full_degree(sundeg)
         moondeg = self.get_full_degree(moondeg)
@@ -786,14 +791,17 @@ class AstrologyCalculator:
     
 
     def organize_planet_ephemeris(
-            self, 
-            planet, 
-            ephemery_string,
-            yesterday_planet_info=None,
-            log=False):
-        """This method organizes the ephemeris data for a single planet into a dictionary. 
-        It uses the get_sign, get_degree, get_house, check_retro, and check_dignity methods to get the necessary information.
+        self, planet, ephemery_string, yesterday_planet_info=None, log=False):
+        """Returns a handy dictionary for a planet. 
+
+        Key values are sign, degree, house, retrograde, dignity, 
+        planet, and ephemery_string.
         """
+        log_message = (
+            f"Logging organize_planet_ephemeris data for "
+            f"planet: {planet}"
+        )
+        self.log(log, log_message)
         planet_info = {
             "sign": self.get_sign(ephemery_string),
             "degree": self.get_degree(ephemery_string),
@@ -803,22 +811,26 @@ class AstrologyCalculator:
             "planet": planet,
             "ephemery_string": ephemery_string
         }
-
         if yesterday_planet_info is None:
             planet_info["zodiac_changed"] = " "
-            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['zodiac_changed']}'")
             planet_info["house_changed"] = " "
-            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['house_changed']}'")
             planet_info["retrograde_changed"] = " "
-            self.log(log, f"No yesterday planet info provided for {planet}. Setting change indicators to '{planet_info['retrograde_changed']}'")
+            log_message = (
+                f"No yesterday planet info provided for {planet}."
+                f"Setting change indicators to empty strings."
+            )
+            self.log(log, log_message)
         else:
             previous_sign = yesterday_planet_info["sign"]
             current_sign = planet_info["sign"]
             if previous_sign != current_sign:
                 planet_info["zodiac_changed"] = "Z"
+                log_message = (
+                    f"Zodiac sign changed for {planet}. "
+                    f"Setting change indicator to Z."
+                )
             else:
                 planet_info["zodiac_changed"] = " "
-                self.log(log, f"Zodiac sign did not change for {planet}. Setting change indicator to '{planet_info['zodiac_changed']}'")
 
             previous_house = yesterday_planet_info["house"]
             current_house = planet_info["house"]
@@ -826,7 +838,6 @@ class AstrologyCalculator:
                 planet_info["house_changed"] = "H"
             else:
                 planet_info["house_changed"] = " "
-                self.log(log, f"House did not change for {planet}. Setting change indicator to '{planet_info['house_changed']}'")
 
             previous_retrograde = yesterday_planet_info["retrograde"]
             current_retrograde = planet_info["retrograde"]
@@ -837,17 +848,19 @@ class AstrologyCalculator:
                     planet_info["retrograde_changed"] = "R"
             else:
                 planet_info["retrograde_changed"] = " "
-                self.log(log, f"Retrograde status did not change for {planet}. Setting change indicator to '{planet_info['retrograde_changed']}'")
+                
 
         if log == True:
-            print(f"Logging organize_planet_ephemeris data for planet: {planet}")
             for key, value in planet_info.items():
                 print(f"\t{key}: {value}")
             print("Finished logging organize_planet_ephemeris data\n")
         return planet_info
 
 
-    def organize_aspect_info(self, planet_info1, planet_info2, aspect_name, log=False):
+    def organize_aspect_info(
+            self, planet_info1, planet_info2, aspect_name, log=False):
+        """Creates a dictionary of aspect info for two planets in aspect.
+        """
         aspect_info = {
             "degree_1": planet_info1["degree"],
             "planet_1": planet_info1["planet"],
@@ -862,7 +875,7 @@ class AstrologyCalculator:
             "zodiac_2": planet_info2["sign"],
             "house_2": planet_info2["house"],
             "station_2": planet_info2["retrograde"],
-            "important": None # Place holder imporant tranist symbol. 
+            "important": None # Place holder important transit symbol. 
         }
         if log == True:
             self.log_aspect_info(aspect_info)
@@ -871,7 +884,7 @@ class AstrologyCalculator:
 
     
     def log_aspect_info(self, aspect_info):
-        """This method makes printing aspect info to the console more readable.
+        """Printing a readable aspect_info dictionary.
         """
         print(f"Organizing aspect info for {aspect_info['planet_1']} and {aspect_info['planet_2']}")
         left_side = [
@@ -894,10 +907,13 @@ class AstrologyCalculator:
         print("Finished organizing aspect info\n")
 
 
-    def organize_all_planets_info_for_day(self, single_day_ephemeris_data, previous_day_ephemeris_data=None, log=False):
-        """This method organizes the ephemeris data for a single day into a dictionary.
+    def organize_all_planets_info_for_day(
+            self, single_day_ephemeris_data, 
+            previous_day_ephemeris_data=None, log=False):
+        """Returns a list of planet info dictionaries.
         
-        single_day_ephemeris_data is one row of the ephemeris data imported from the csv file."""
+        single_day_ephemeris_data is one row of the 
+        ephemeris data imported from the csv file."""
         if log == True:
             print("\nLogging organize_all_planets_info_for_day:")
             print(f"Single day ephemeris data: ")
@@ -912,10 +928,8 @@ class AstrologyCalculator:
             else:
                 yesterday_planet_info = None
             planet_info = self.organize_planet_ephemeris(
-                    planet_name,
-                    ephemery_string,
-                    yesterday_planet_info,
-                    log=log
+                    planet_name, ephemery_string,
+                    yesterday_planet_info, log=log
             )
             all_planet_info_for_day[planet_name] = planet_info
         return all_planet_info_for_day
@@ -939,10 +953,10 @@ class AstrologyCalculator:
     
 
     def daylight_savings_time_offset(self, date):
-        """This method finds the daylight savings time offset for a given date. 
-        
-        It returns 1 for daylight savings time, and 0 for standard time.
-        In the US, daylight savings time starts on the second Sunday in March and ends on the first Sunday in November."""
+        """Returns 1 for daylight savings time, and 0 for standard time.
+        In the US, daylight savings time starts on the 
+        second Sunday in March and ends on the first Sunday in November.
+        """
         second_sunday_in_march = self.find_2nd_sunday_in_march(self.year)
         first_sunday_in_november = self.find_1st_sunday_in_november(self.year)
 
@@ -992,7 +1006,7 @@ class AstrologyCalculator:
             return ""
 
 
-    def organize_day_ephemeris(
+    def get_all_info_for_day(
             self, 
             single_day_ephemeris_data,
             previous_day_ephemeris_data=None,
@@ -1001,12 +1015,13 @@ class AstrologyCalculator:
         
         Offset date and time are for adjusting for different time zones.
         """
-        self.log(log, "\nLogging organize_day_ephemeris:")
+        self.log(log, "\nLogging get_all_info_for_day:")
         from datetime import datetime, timedelta
         date_string = single_day_ephemeris_data[0]
-        self.log(log, f"Date string from ephemeris data: {date_string}")
         date_number = int(date_string[3:5])
         date_at_00_ut = datetime(self.year, self.month_num, date_number)
+
+        self.log(log, f"Date string from ephemeris data: {date_string}")
         self.log(log, f"Date at 00:00 UT: {date_at_00_ut}")
 
         # Handling time zones and daylight savings time
@@ -1022,12 +1037,20 @@ class AstrologyCalculator:
                 previous_day_ephemeris_data,
                 log)
           
-        equinox_or_solstice = self.is_equinox_or_solstice(all_planet_info_for_day["sun"])
-        transits_aspecting_natal = self.get_all_natal_aspects_for_day(all_planet_info_for_day, self.orb, log)
-        transits_aspecting_eachother = self.get_all_transit_only_aspects_for_day(all_planet_info_for_day, self.orb, log)
+        equinox_or_solstice = self.is_equinox_or_solstice(
+            all_planet_info_for_day["sun"])
+        
+        transits_aspecting_natal = self.get_all_natal_aspects_for_day(
+            all_planet_info_for_day, self.orb, log)
+        
+        transits_aspecting_eachother = self.get_all_transit_only_aspects_for_day(
+            all_planet_info_for_day, self.orb, log)
+        
         sun_ephemery_string = all_planet_info_for_day["sun"]["ephemery_string"]
         moon_ephemery_string = all_planet_info_for_day["moon"]["ephemery_string"]
-        moon_phase = self.check_moon_phase(sun_ephemery_string, moon_ephemery_string)
+        moon_phase = self.check_moon_phase(
+            sun_ephemery_string, moon_ephemery_string)
+        
         moon_phase_first_word = self.MOON_PHASE_NAMES[moon_phase][0]
         moon_phase_second_word = self.MOON_PHASE_NAMES[moon_phase][1]
         
@@ -1057,7 +1080,8 @@ class AstrologyCalculator:
                         print(f"\t\t{planet}:")
                         for info_key, info_value in planet_info.items():
                             print(f"\t\t\t{info_key}: {info_value}")
-                elif key == "transits_aspecting_each_other" or key == "transits_aspecting_natal":
+                elif (key == "transits_aspecting_each_other" or 
+                      key == "transits_aspecting_natal"):
                     print("====================================================")
                     print(f"\n{key}:\n")
                     for aspect_info in value:
@@ -1068,10 +1092,11 @@ class AstrologyCalculator:
         return complete_day_dict
 
 
-    def organize_month_ephemeris(self, log=False):
-        """This method organizes the ephemeris data for a month into a dictionary. 
+    def get_all_info_for_month(self, log=False):
+        """Returns a list of days. Each with information. 
         
-        It loops through each day in the month and organizes the ephemeris data for that day using the organize_day_ephemeris method.
+        It loops through each day using the 
+        get_all_info_for_day method.
         """
         month_list = []
         for count, row in enumerate(self.ephemeris_data):
@@ -1079,7 +1104,7 @@ class AstrologyCalculator:
                 previous_day_ephemeris_data = None
             else:
                 previous_day_ephemeris_data = month_list[count-1]["all_planet_positions"]
-            single_day_dict = self.organize_day_ephemeris(row, previous_day_ephemeris_data, log)
+            single_day_dict = self.get_all_info_for_day(row, previous_day_ephemeris_data, log)
             month_list.append(single_day_dict)
         return month_list
 
@@ -1088,10 +1113,11 @@ ASTROLOGY_OBJECT = AstrologyCalculator(NATAL_PLANETS, NATAL_HOUSES, YEAR_MONTH, 
 
 
 single_row_from_csv = ASTROLOGY_OBJECT.ephemeris_data[ROW_TO_CALCULATE]
-ASTROLOGY_OBJECT.organize_month_ephemeris(log=CALCULATOR_LOG)
+ASTROLOGY_OBJECT.get_all_info_for_month(log=CALCULATOR_LOG)
 
 
 class DrawAstrology():
+    # Using this we can draw shapes by name.
     TILE_INDEX = {
         "aries":114,
         "taurus":115,
@@ -1197,7 +1223,9 @@ class DrawAstrology():
         #self.block_border(x, y, width, height, self.color, self.bg_color)
 
 
-    def border(self, frame, layer, x, y, width, height, fg_color, corner=207, edge=206):
+    def border(
+            self, frame, layer, x, y, width, height, 
+            fg_color, corner=207, edge=206):
         # Setting the corners
         fg_color = self.color
         self.art_obj.set_tile_at(frame, layer, x, y, corner, fg_color)
@@ -1215,11 +1243,17 @@ class DrawAstrology():
                 corner, fg_color, None, 2)
         
         for i in range(x+1,x+width-1):
-            self.art_obj.set_tile_at(frame, layer, i, y, edge, fg_color, None, self.flip_v(0))
-            self.art_obj.set_tile_at(frame, layer, i, y + height-1, edge, fg_color)
+            self.art_obj.set_tile_at(
+                frame, layer, i, y, edge, fg_color, None, self.flip_v(0))
+            
+            self.art_obj.set_tile_at(
+                frame, layer, i, y + height-1, edge, fg_color)
+            
         for i in range(y+1,y+height-1):
-            self.art_obj.set_tile_at(frame, layer, x, i, edge, fg_color, None, 1)
-            self.art_obj.set_tile_at(frame, layer, x+width - 1, i, edge, fg_color, None, self.flip_h(1))
+            self.art_obj.set_tile_at(
+                frame, layer, x, i, edge, fg_color, None, 1)
+            self.art_obj.set_tile_at(
+                frame, layer, x+width - 1, i, edge, fg_color, None, self.flip_h(1))
 
 
     def flip_v(self, xform):
@@ -1260,26 +1294,32 @@ class DrawAstrology():
         if bg_color == None: bg_color = self.bg_color
         if transform == None: transform = 0
     
-        self.art_obj.set_tile_at(frame, layer, x, y, tile, fg_color, bg_color, transform)
+        self.art_obj.set_tile_at(
+            frame, layer, x, y, tile, fg_color, bg_color, transform)
 
 
-    def write_sideways(self, frame, layer, x, y, string, fg_color, bg_color=None):
+    def write_sideways(
+            self, frame, layer, x, y, string, 
+            fg_color, bg_color=None):
         """This method writes a string vertically instead of horizontally.
         
-        The letters are written top to bottom, and the letters don't have any rotation."""
+        The letters are written top to bottom, 
+        and the letters don't have any rotation.
+        """
         for count, letter in enumerate(string):
             if y+count > self.art_obj.height-1:
-                print(f"Error: trying to write outside the bounds of the art object. Stopping writing string '{string}' at letter '{letter}'")
+                error_message = (
+                    "Error: trying to write outside the bounds of "
+                    "the art object. Stopping writing "
+                    f"string at letter '{letter}'"
+
+                )
+                print(error_message)
                 break
 
             self.art_obj.write_string(
-                    frame, 
-                    layer, 
-                    x, 
-                    y+count, 
-                    letter, 
-                    fg_color, 
-                    bg_color)
+                    frame, layer, x, y+count, letter, 
+                    fg_color, bg_color)
             
     
     def block_border(self, frame, layer, x, y, width, height, 
@@ -1290,50 +1330,57 @@ class DrawAstrology():
         if bg_color is None:
             bg_color = self.bg_color
 
-        if x + width > self.art_obj.width or y + height > self.art_obj.height:
-            print(f"Error: trying to draw a block border outside the bounds of the art object. Stopping drawing at width {width} and height {height}.")
+        if (x + width > self.art_obj.width or 
+            y + height > self.art_obj.height):
+            error_message = (
+                "Error: trying to draw a block border outside the bounds of "
+                f"the art object. Stopping drawing at width {width} and height {height}."
+            )
+            print(error_message)
             return
 
-        self.art_obj.set_tile_at(frame, layer, 
-                                 x, y,
-                                 self.TILE_INDEX["right_triangle"],
-                                 fg_color)
-        self.art_obj.set_tile_at(frame, layer,
-                                 x+width-1, y, 
-                                 self.TILE_INDEX["tile_edge_corner"], 
-                                 fg_color, bg_color, 2)
-        self.art_obj.set_tile_at(frame, layer, 
-                                 x, y + height-1,
-                                 self.TILE_INDEX["solid"],
-                                 fg_color, None, 3)
-        self.art_obj.set_tile_at(frame, layer,
-                                 x + width-1, y + height-1, 
-                                 self.TILE_INDEX["right_triangle"], 
-                                 fg_color, None, 2)
+        self.art_obj.set_tile_at(
+            frame, layer, x, y, self.TILE_INDEX["right_triangle"], 
+            fg_color)
+        
+        self.art_obj.set_tile_at(
+            frame, layer,x+width-1, y, 
+            self.TILE_INDEX["tile_edge_corner"], fg_color, bg_color, 2)
+        
+        self.art_obj.set_tile_at(
+            frame, layer, x, y + height-1, self.TILE_INDEX["solid"],
+            fg_color, None, 3)
+        
+        self.art_obj.set_tile_at(
+            frame, layer, x + width-1, y + height-1, 
+            self.TILE_INDEX["right_triangle"], fg_color, None, 2)
+        
         #sets horizontal edges
         for i in range(x+1,x+width-1):
             #top edge
-            self.art_obj.set_tile_at(frame, layer, i, y,
-                                     self.TILE_INDEX["tile_edge_side"], 
-                                     fg_color, bg_color, 2)
+            self.art_obj.set_tile_at(
+                frame, layer, i, y, self.TILE_INDEX["tile_edge_side"], 
+                fg_color, bg_color, 2)
+            
             #bottom edge
-            self.art_obj.set_tile_at(frame, layer,
-                                     i, y + height-1, 
-                                     self.TILE_INDEX["solid"], fg_color)
+            self.art_obj.set_tile_at(
+                frame, layer, i, y + height-1, self.TILE_INDEX["solid"], fg_color)
+            
             if bg_color is not None:
                 for p in range(y+1,y+height-1):
                     self.art_obj.bg_colors[frame][layer][p][i] = bg_color
+        
         #sets vertical edges
         for i in range(y+1,y+height-1):
             #left edge
-            self.art_obj.set_tile_at(frame, layer,
-                                     x, i, self.TILE_INDEX["solid"], 
-                                     fg_color, None, 0)
+            self.art_obj.set_tile_at(
+                frame, layer, x, i, self.TILE_INDEX["solid"], 
+                fg_color, None, 0)
+            
             #right edge
-            self.art_obj.set_tile_at(frame, layer, 
-                                     x+width - 1, i, 
-                                     self.TILE_INDEX["tile_edge_side"], 
-                                     fg_color, bg_color, 3
+            self.art_obj.set_tile_at(
+                frame, layer, x+width - 1, i, self.TILE_INDEX["tile_edge_side"], 
+                fg_color, bg_color, 3
             )
 
     def draw_change_in(self, frame, layer, x, y):
@@ -1712,6 +1759,6 @@ single_day_dict = ASTROLOGY_OBJECT.organize_day_ephemeris(
 da.draw_day(0, INFO_LAYER, single_day_dict)
 """
 
-organized_month_data = ASTROLOGY_OBJECT.organize_month_ephemeris(log=CALCULATOR_LOG)
+organized_month_data = ASTROLOGY_OBJECT.get_all_info_for_month(log=CALCULATOR_LOG)
 da.draw_month(organized_month_data)
 
