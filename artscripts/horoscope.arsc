@@ -1664,16 +1664,6 @@ class DrawAstrology():
         return calendar.monthrange(year, month_num)[1]
 
 
-    def add_frame_check(self, art_obj):	
-        """Used in the draw_month method to add a frame if the month isn't over."""
-        current_date = self.frame+1
-        month_range = self.get_month_range()
-        
-        # Change this to variable later to accord with different month sizes. or just remove this
-        if current_date < month_range: 
-            art_obj.add_frame_to_end()
-
-
     def draw_day(self, frame, layer, organized_day_data):
         """Draws the data for a single day."""
         month_name = organized_day_data["month_name"]
