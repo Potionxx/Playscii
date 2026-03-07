@@ -52,7 +52,11 @@ class ConvertImageOptionsDialog(ImportOptionsDialog):
     field7_label = '%% of source image: (%s)'
     field8_label = '  '
     field10_label = 'Smooth (bicubic) scale source image'
-    radio_groups = [(1, 2), (6, 7)]
+    field12_label = 'Color difference model:'
+    field13_label = 'CIE Lab (legacy default)'
+    field14_label = 'RGB (fastest)'
+    field15_label = 'OKLab (perceptual)'
+    radio_groups = [(1, 2), (6, 7), (13, 14, 15)]
     field_width = UIDialog.default_short_field_width
     # to get the layout we want, we must specify 0 padding lines and
     # add some blank ones :/
@@ -69,6 +73,11 @@ class ConvertImageOptionsDialog(ImportOptionsDialog):
         Field(label=field8_label, type=float, width=field_width, oneline=True),
         Field(label='', type=None, width=0, oneline=True),
         Field(label=field10_label, type=bool, width=0, oneline=True),
+        Field(label='', type=None, width=0, oneline=True),
+        Field(label=field12_label, type=None, width=0, oneline=True),
+        Field(label=field13_label, type=bool, width=0, oneline=True),
+        Field(label=field14_label, type=bool, width=0, oneline=True),
+        Field(label=field15_label, type=bool, width=0, oneline=True),
         Field(label='', type=None, width=0, oneline=True)
     ]
     invalid_color_error = 'Palettes must be between 2 and 256 colors.'
@@ -89,6 +98,8 @@ class ConvertImageOptionsDialog(ImportOptionsDialog):
             return '50.0'
         elif field_number == 10:
             return ' '
+        elif field_number == 13:
+            return UIDialog.true_field_text
         return ''
     
     def get_field_label(self, field_index):
@@ -167,6 +178,12 @@ class ConvertImageOptionsDialog(ImportOptionsDialog):
             # art dimensions = scale% of image dimensions, in tiles
             options['art_width'], options['art_height'] = self.get_tile_scale()
         options['bicubic_scale'] = bool(self.field_texts[10].strip())
+        if self.field_texts[14].strip():
+            options['color_compare_model'] = ImageConverter.COLOR_COMPARE_MODEL_RGB
+        elif self.field_texts[15].strip():
+            options['color_compare_model'] = ImageConverter.COLOR_COMPARE_MODEL_OKLAB
+        else:
+            options['color_compare_model'] = ImageConverter.COLOR_COMPARE_MODEL_LAB
         ImportOptionsDialog.do_import(self.ui.app, self.filename, options)
 
 
@@ -186,8 +203,11 @@ Bitmap image in PNG, JPEG, or BMP format.
         width, height = options['art_width'], options['art_height']
         self.art.resize(width, height) # Importer.init will adjust UI
         bicubic_scale = options['bicubic_scale']
+        color_compare_model = options.get('color_compare_model',
+                                          ImageConverter.COLOR_COMPARE_MODEL_LAB)
         # let ImageConverter do the actual heavy lifting
-        ic = ImageConverter(self.app, in_filename, self.art, bicubic_scale)
+        ic = ImageConverter(self.app, in_filename, self.art, bicubic_scale,
+                            color_compare_model=color_compare_model)
         # early failures: file no longer exists, PIL fails to load and convert image
         if not ic.init_success:
             return False

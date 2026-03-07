@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image, ImageChops, ImageStat
 
 from renderable_sprite import SpriteRenderable
-from lab_color import rgb_to_lab, lab_color_diff
+from lab_color import rgb_to_lab, lab_color_diff, rgb_to_oklab, oklab_color_diff
 
 """
 notes / future research
@@ -26,12 +26,21 @@ https://www.youtube.com/watch?v=L6CkYou6hYU
 class ImageConverter:
     
     tiles_per_tick = 1
+    COLOR_COMPARE_MODEL_RGB = 'rgb'
+    COLOR_COMPARE_MODEL_LAB = 'lab'
+    COLOR_COMPARE_MODEL_OKLAB = 'oklab'
+    COLOR_COMPARE_MODELS = (
+        COLOR_COMPARE_MODEL_RGB,
+        COLOR_COMPARE_MODEL_LAB,
+        COLOR_COMPARE_MODEL_OKLAB,
+    )
     lab_color_comparison = True
     # delay in seconds before beginning to convert tiles.
     # lets eg UI catch up to BitmapImageImporter changes to Art.
     start_delay = 1.0
     
-    def __init__(self, app, image_filename, art, bicubic_scale=False, sequence_converter=None):
+    def __init__(self, app, image_filename, art, bicubic_scale=False,
+                 sequence_converter=None, color_compare_model=None):
         self.init_success = False
         image_filename = app.find_filename_path(image_filename)
         if not image_filename or not os.path.exists(image_filename):
@@ -43,6 +52,7 @@ class ImageConverter:
         self.image_filename = image_filename
         self.art = art
         self.finished = False
+        self.color_compare_model = self.get_color_compare_model(color_compare_model)
         # if an ImageSequenceConverter created us, keep a handle to it
         self.sequence_converter = sequence_converter
         try:
@@ -112,13 +122,25 @@ class ImageConverter:
         # build table of color diffs
         unique_colors = len(colors)
         color_diffs = np.zeros((unique_colors, unique_colors), dtype=np.float32)
-        # option: L*a*b color space conversion for greater accuracy
-        get_color_diff = self.get_lab_color_diff if self.lab_color_comparison else self.get_rgb_color_diff
+        if self.color_compare_model == self.COLOR_COMPARE_MODEL_RGB:
+            get_color_diff = self.get_rgb_color_diff
+        elif self.color_compare_model == self.COLOR_COMPARE_MODEL_OKLAB:
+            get_color_diff = self.get_oklab_color_diff
+        else:
+            get_color_diff = self.get_lab_color_diff
         #get_color_diff = self.get_nonlinear_rgb_color_diff
         for i,color in enumerate(colors):
             for j,other_color in enumerate(colors):
                 color_diffs[i][j] = get_color_diff(color, other_color)
         return color_diffs
+
+    def get_color_compare_model(self, color_compare_model):
+        if color_compare_model in self.COLOR_COMPARE_MODELS:
+            return color_compare_model
+        # Preserve existing behavior if nothing is explicitly requested.
+        if self.lab_color_comparison:
+            return self.COLOR_COMPARE_MODEL_LAB
+        return self.COLOR_COMPARE_MODEL_RGB
     
     def get_rgb_color_diff(self, color1, color2):
         r = abs(color1[0] - color2[0])
@@ -131,6 +153,11 @@ class ImageConverter:
         l1, a1, b1 = rgb_to_lab(*color1[:3])
         l2, a2, b2 = rgb_to_lab(*color2[:3])
         return lab_color_diff(l1, a1, b1, l2, a2, b2)
+
+    def get_oklab_color_diff(self, color1, color2):
+        l1, a1, b1 = rgb_to_oklab(*color1[:3])
+        l2, a2, b2 = rgb_to_oklab(*color2[:3])
+        return oklab_color_diff(l1, a1, b1, l2, a2, b2)
     
     def get_nonlinear_rgb_color_diff(self, color1, color2):
         # from http://www.compuphase.com/cmetric.htm

@@ -10,7 +10,8 @@ import formats.in_bitmap as bm
 
 class ImageSequenceConverter:
     
-    def __init__(self, app, image_filenames, art, bicubic_scale):
+    def __init__(self, app, image_filenames, art, bicubic_scale,
+                 color_compare_model=image_convert.ImageConverter.COLOR_COMPARE_MODEL_LAB):
         self.init_success = False
         self.app = app
         self.start_time = time.time()
@@ -21,6 +22,7 @@ class ImageSequenceConverter:
         self.image_name = os.path.splitext(self.image_filename)[0]
         self.art = art
         self.bicubic_scale = bicubic_scale
+        self.color_compare_model = color_compare_model
         # queue up first frame
         self.next_image(first=True)
         self.init_success = True
@@ -39,7 +41,9 @@ class ImageSequenceConverter:
             self.current_frame_converter = image_convert.ImageConverter(self.app,
                                                       self.image_filenames[0],
                                                       self.art,
-                                                      self.bicubic_scale, self)
+                                                      self.bicubic_scale,
+                                                      self,
+                                                      self.color_compare_model)
         except:
             self.fail()
             return
@@ -91,6 +95,8 @@ image chosen.
         width, height = options['art_width'], options['art_height']
         self.art.resize(width, height) # Importer.init will adjust UI
         bicubic_scale = options['bicubic_scale']
+        color_compare_model = options.get('color_compare_model',
+                          image_convert.ImageConverter.COLOR_COMPARE_MODEL_LAB)
         # get dir listing with full pathname
         in_dir = os.path.dirname(in_filename)
         in_files = ['%s/%s' % (in_dir, f) for f in os.listdir(in_dir)]
@@ -107,7 +113,7 @@ image chosen.
         self.art.set_active_frame(0)
         # create converter
         isc = ImageSequenceConverter(self.app, in_files, self.art,
-                                     bicubic_scale)
+                                     bicubic_scale, color_compare_model)
         # bail on early failure
         if not isc.init_success:
             return False

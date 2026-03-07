@@ -14,6 +14,10 @@ class TwoColorConvertImageOptionsDialog(ConvertImageOptionsDialog):
     field7_label = ConvertImageOptionsDialog.field7_label
     field8_label = ConvertImageOptionsDialog.field8_label
     field10_label = ConvertImageOptionsDialog.field10_label
+    field12_label = ConvertImageOptionsDialog.field12_label
+    field13_label = ConvertImageOptionsDialog.field13_label
+    field14_label = ConvertImageOptionsDialog.field14_label
+    field15_label = ConvertImageOptionsDialog.field15_label
     field_width = ConvertImageOptionsDialog.field_width
     fields = [
         Field(label='', type=SkipFieldType, width=0, oneline=True),
@@ -27,6 +31,11 @@ class TwoColorConvertImageOptionsDialog(ConvertImageOptionsDialog):
         Field(label=field8_label, type=float, width=field_width, oneline=True),
         Field(label='', type=None, width=0, oneline=True),
         Field(label=field10_label, type=bool, width=0, oneline=True),
+        Field(label='', type=None, width=0, oneline=True),
+        Field(label=field12_label, type=None, width=0, oneline=True),
+        Field(label=field13_label, type=bool, width=0, oneline=True),
+        Field(label=field14_label, type=bool, width=0, oneline=True),
+        Field(label=field15_label, type=bool, width=0, oneline=True),
         Field(label='', type=None, width=0, oneline=True)
     ]
     
@@ -78,7 +87,11 @@ fg/bg color swaps. Suitable for plaintext export.
         width, height = options['art_width'], options['art_height']
         self.art.resize(width, height) # Importer.init will adjust UI
         bicubic_scale = options['bicubic_scale']
-        ic = TwoColorImageConverter(self.app, in_filename, self.art, bicubic_scale)
+        color_compare_model = options.get('color_compare_model',
+                                          ImageConverter.COLOR_COMPARE_MODEL_LAB)
+        ic = TwoColorImageConverter(self.app, in_filename, self.art,
+                                    bicubic_scale,
+                                    color_compare_model=color_compare_model)
         # early failures: file no longer exists, PIL fails to load and convert image
         if not ic.init_success:
             return False
